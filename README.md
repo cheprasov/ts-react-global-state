@@ -1,6 +1,73 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v0.0.1)
+@cheprasov/react-global-state (v0.0.1-dev2)
 =========
+
+The library based on React Context API and allows to use global state easy.
+
+**Note:** Currently React Class Components are not supported. Work in progress.
+
+### 1. How to install
+
+```bash
+> npm install @cheprasov/react-global-state
+```
+
+```javascript
+import { createGlobalState, useGlobalState } from '@cheprasov/react-global-state';
+```
+
+### 2. Quick examples
+
+#### 2.1. Create new Global State scope
+
+```javascript
+import { createGlobalState } from '@cheprasov/react-global-state';
+
+const userScope = {
+  name: 'Alex',
+  city: 'London',
+  age: 37,
+}
+
+const GlobalState = createGlobalState('user', userScope); // return React.FunctionComponent 
+
+// Then add once the GlobalState for render at any level you need
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
+    <GlobalState>
+      <App />
+    </GlobalState>
+);
+
+```
+
+#### 2.2. Read / Update from Global State 
+```javascript
+import { useGlobalState } from '@cheprasov/react-global-state';
+
+const Name: React.FC = () => {
+
+ // Use useGlobalState<string, number>('user', 'name', 'age') for TypeScript 
+ // Note: useGlobalState returns `value` and `setValue` for each required (name, age) field like a `React.useState()`
+ const [ name, setName, age, setAge ] = useGlobalState('user', 'name', 'age');
+ 
+ const increaseAge = () => {
+  // `set functions` has the same API like a `set function` from React.useState()
+  setAge((age) => age + 1);
+ }
+ 
+  return (
+    <div>
+      User Name: {name}
+      <br />
+      Age: {age} <button onClick={increaseAge}></button>
+    </div>
+  );
+}
+```
+
+### 3. Documentation
 
 WIP
