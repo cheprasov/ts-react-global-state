@@ -1,6 +1,6 @@
 {
     "name": "@cheprasov/react-global-state",
-    "version": "0.0.1-dev2",
+    "version": "0.0.1-dev3",
     "author": "Alexander Cheprasov",
     "description": "React library for managing Global State",
     "keywords": [

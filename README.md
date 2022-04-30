@@ -25,12 +25,12 @@ import { createGlobalState, useGlobalState } from '@cheprasov/react-global-state
 import { createGlobalState } from '@cheprasov/react-global-state';
 
 const userScope = {
-  name: 'Alex',
-  city: 'London',
-  age: 37,
+    name: 'Alex',
+    city: 'London',
+    age: 37,
 }
 
-const GlobalState = createGlobalState('user', userScope); // return React.FunctionComponent 
+const GlobalState = createGlobalState('user', userScope); // return React.FunctionComponent
 
 // Then add once the GlobalState for render at any level you need
 
@@ -43,28 +43,29 @@ root.render(
 
 ```
 
-#### 2.2. Read / Update from Global State 
+#### 2.2. Read / Update Global State
 ```javascript
 import { useGlobalState } from '@cheprasov/react-global-state';
 
 const Name: React.FC = () => {
 
- // Use useGlobalState<string, number>('user', 'name', 'age') for TypeScript 
- // Note: useGlobalState returns `value` and `setValue` for each required (name, age) field like a `React.useState()`
- const [ name, setName, age, setAge ] = useGlobalState('user', 'name', 'age');
- 
- const increaseAge = () => {
-  // `set functions` has the same API like a `set function` from React.useState()
-  setAge((age) => age + 1);
- }
- 
-  return (
-    <div>
-      User Name: {name}
-      <br />
-      Age: {age} <button onClick={increaseAge}></button>
-    </div>
-  );
+    // Use useGlobalState<UserScopeInterface>('user') for TypeScript
+    const globalState = useGlobalState('user');
+    const [ name, setName ] = globalState.name; // like useState
+    const [ age, setAge ] = globalState.age; // like useState
+
+    const increaseAge = () => {
+        // `set function` has the same API like a `set function` from React.useState()
+        setAge((age) => age + 1);
+    }
+
+    return (
+        <div>
+            User Name: {name}
+            <br />
+            Age: {age} <button onClick={increaseAge}></button>
+        </div>
+    );
 }
 ```
 
