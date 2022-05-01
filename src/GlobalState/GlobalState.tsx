@@ -4,21 +4,22 @@ export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
 export type StateTuple<T> = [T, SetStateType<T>];
 
-// React Dev Tool Error workaround
-const createStateDefinerHack = (obj: Record<string, any>) => {
-    const body: string[] = [];
+const createStateDefiner = (obj: Record<string, any>) => {
+    const body: string[] = [`var n = {};`];
     for (const key in obj) {
         if (!obj.hasOwnProperty(key)) {
             continue;
         }
         const k = JSON.stringify(key);
-        body.push(`m.set(${k},u(o[${k}]));`);
+        body.push(`n[${k}] = u(o[${k}]);`);
     }
-    return new Function('o', 'm', 'u', body.join('\n'));
+    body.push('return n;');
+    return new Function('o', 'u', body.join('\n')) as (
+        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTuple<any>>
+    );
 }
 
 const contextByName = new Map<string, Context<any>>();
-const stateMapByName = new Map<string, Map<string, StateTuple<any>>>();
 
 export const createGlobalState = (name: string, scope: Record<string, StateValueType<any>>) => {
     if (contextByName.has(name)) {
@@ -27,20 +28,10 @@ export const createGlobalState = (name: string, scope: Record<string, StateValue
     const Context = React.createContext(scope);
     contextByName.set(name, Context);
 
-    const stateMap = stateMapByName.get(name) || new Map<string, StateTuple<any>>();
-    if (!stateMapByName.has(name)) {
-        stateMapByName.set(name, stateMap);
-    }
-
-    const stateDefiner = createStateDefinerHack(scope);
+    const stateDefiner = createStateDefiner(scope);
 
     const ContextNode: React.FunctionComponent<{children: React.ReactNode}> = React.memo(({ children }) => {
-        const scopeValues: Record<string, any> = {};
-        stateDefiner(scope, stateMap, useState);
-        stateMap.forEach((valueWithSet, key) => {
-            scopeValues[key] = valueWithSet as StateTuple<any>;
-        });
-
+        const scopeValues = stateDefiner(scope, useState);
         return (
             <Context.Provider value={scopeValues}>
                 {children}
