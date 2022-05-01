@@ -4,7 +4,7 @@ export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
 export type StateTuple<T> = [T, SetStateType<T>];
 
-const createStateDefiner = (obj: Record<string, any>) => {
+export const createStateDefiner = (obj: Record<string, any>) => {
     const body: string[] = [`var n = {};`];
     for (const key in obj) {
         if (!obj.hasOwnProperty(key)) {
