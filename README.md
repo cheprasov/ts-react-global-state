@@ -47,7 +47,7 @@ root.render(
 ```javascript
 import { useGlobalState } from '@cheprasov/react-global-state';
 
-const Name: React.FC = () => {
+const User: React.FC = () => {
 
     // Use useGlobalState<UserScopeInterface>('user') for TypeScript
     const globalState = useGlobalState('user');
@@ -56,14 +56,14 @@ const Name: React.FC = () => {
 
     const increaseAge = () => {
         // `set function` has the same API like a `set function` from React.useState()
-        setAge((age) => age + 1);
+        setAge((value) => value + 1);
     }
 
     return (
         <div>
             User Name: {name}
             <br />
-            Age: {age} <button onClick={increaseAge}></button>
+            Age: {age} <button onClick={increaseAge}>+</button>
         </div>
     );
 }

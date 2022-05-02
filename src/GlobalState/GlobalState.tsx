@@ -30,16 +30,16 @@ export const createGlobalState = (name: string, scope: Record<string, StateValue
 
     const stateDefiner = createStateDefiner(scope);
 
-    const ContextNode: React.FunctionComponent<{children: React.ReactNode}> = React.memo(({ children }) => {
+    const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const scopeValues = stateDefiner(scope, useState);
         return (
             <Context.Provider value={scopeValues}>
                 {children}
             </Context.Provider>
         );
-    });
+    };
 
-    return ContextNode;
+    return React.memo(ContextNode);
 };
 
 export const useGlobalState = <T extends Record<string, any>>
