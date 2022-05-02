@@ -3,7 +3,7 @@
 @cheprasov/react-global-state (v0.0.1-dev5)
 =========
 
-The library based on React Context API and allows to use global state easy.
+The library is based on React Context API and allows to pass states (values & set functions) to children components easy via Context.
 
 **Note:** Currently React Class Components are not supported. Work in progress.
 
@@ -24,6 +24,7 @@ import { createGlobalState, useGlobalState } from '@cheprasov/react-global-state
 ```javascript
 import { createGlobalState } from '@cheprasov/react-global-state';
 
+// The original object will not be changed
 const userScope = {
     name: 'Alex',
     city: 'London',
