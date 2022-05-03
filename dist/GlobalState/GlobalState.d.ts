@@ -3,6 +3,7 @@ export declare type StateValueType<T> = T | (() => T);
 export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
 export declare type StateTuple<T> = [T, SetStateType<T>];
 export declare const createStateDefiner: (obj: Record<string, any>) => (obj: Record<string, any>, use: typeof useState) => Record<string, StateTuple<any>>;
+export declare const contextByName: Map<string, React.Context<any>>;
 export declare const createGlobalState: (name: string, scope: Record<string, StateValueType<any>>) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
