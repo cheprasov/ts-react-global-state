@@ -1,5 +1,5 @@
 import React from 'react';
-import { createGlobalState, createStateDefiner, useGlobalState } from './GlobalState'
+import { contextByName, createGlobalState, createStateDefiner, useGlobalState } from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -81,14 +81,21 @@ return n;
     });
 
     describe('createGlobalState', () => {
-        // it('should create React.Function component wrapped by React.memo', () => {
-        //     const GlobalState = createGlobalState('user', { name: 'Alex', age: 37, city: 'London' });
-        //     // @ts-ignore
-        //     console.log(GlobalState.type, React.isValidElement(GlobalState.type));
-        //     // @ts-ignore
-        //     expect(GlobalState).toBeInstanceOf(React.isValidElement(GlobalState));
-        //     // console.log(GlobalState.$$typeof);
-        // });
+        afterEach(() => {
+            contextByName.clear();
+        });
+
+        it('should create React.Function component wrapped by React.memo', () => {
+            const GlobalState = createGlobalState('user', { name: 'Alex', age: 37, city: 'London' });
+            expect(GlobalState['$$typeof']).toEqual(Symbol.for('react.memo'));
+        });
+
+        it('should throw an Error if scope created already', () => {
+            createGlobalState('user', { name: 'Alex', age: 37, city: 'London' });
+            expect(() => {
+                createGlobalState('user', { foo: 'bar' });
+            }).toThrowError("GlobalState scope 'user' already exists");
+        });
     });
 
     describe('useGlobalState', () => {
@@ -101,6 +108,10 @@ return n;
 
         beforeAll(() => {
             UserGlobalState = createGlobalState('user', userScope);
+        });
+
+        afterAll(() => {
+            contextByName.clear();
         });
 
         const User: React.FC = () => {

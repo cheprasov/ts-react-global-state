@@ -1,12 +1,15 @@
 {
     "name": "@cheprasov/react-global-state",
-    "version": "0.0.1-dev5",
+    "version": "1.0.0",
     "author": "Alexander Cheprasov",
-    "description": "React library for managing Global State",
+    "description": "The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.",
     "keywords": [
         "react",
         "state",
-        "global state"
+        "global state",
+        "react global state",
+        "state manager",
+        "state manager react"
     ],
     "main": "dist/index.js",
     "license": "MIT",
@@ -39,7 +42,7 @@
         "build:prod": "webpack --mode production",
         "build": "webpack --mode development",
         "build:watch": "webpack --watch --mode development",
-        "flow": "flow",
+        "publish": "npm run build:prod && npm publish --access=public",
         "eslint": "node ./node_modules/.bin/eslint ./app/src/",
         "test": "jest"
     }

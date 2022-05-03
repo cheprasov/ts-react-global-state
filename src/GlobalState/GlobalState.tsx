@@ -19,7 +19,7 @@ export const createStateDefiner = (obj: Record<string, any>) => {
     );
 }
 
-const contextByName = new Map<string, Context<any>>();
+export const contextByName = new Map<string, Context<any>>();
 
 export const createGlobalState = (name: string, scope: Record<string, StateValueType<any>>) => {
     if (contextByName.has(name)) {
