@@ -1,8 +1,9 @@
-import React, { useContext, Context, useState, Dispatch, SetStateAction } from 'react';
+import React, { useContext, Context, useState, Dispatch, SetStateAction, createElement } from 'react';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
-export type StateTuple<T> = [T, SetStateType<T>];
+export type StateTupleType<T> = [T, SetStateType<T>];
+export type GlobalStateType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
 
 export const createStateDefiner = (obj: Record<string, any>) => {
     const body: string[] = [`var n = {};`];
@@ -15,7 +16,7 @@ export const createStateDefiner = (obj: Record<string, any>) => {
     }
     body.push('return n;');
     return new Function('o', 'u', body.join('\n')) as (
-        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTuple<any>>
+        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTupleType<any>>
     );
 }
 
@@ -50,3 +51,13 @@ export const useGlobalState = <T extends Record<string, any>>
     }
     return useContext(Context);
 };
+
+export const withGlobalState = (Component: React.ComponentProps<any>, name: string, propName: string = '') => {
+    const encodedName = JSON.stringify(name);
+    const encodedPropName = JSON.stringify(propName || `${name}GlobalScope`);
+    return new Function('u', 'c', 'C', 'p', `
+        var n = Object.assign({ [${encodedPropName}]: u(${encodedName}) }, p);
+        delete n.children;
+        return c(C, n, p.children);
+    `).bind(null, useGlobalState, createElement, Component);
+}

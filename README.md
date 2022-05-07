@@ -1,14 +1,17 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v1.0.0)
+@cheprasov/react-global-state (v1.1.0)
 =========
 
 The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
 
 **Note:** Currently React Class Components are not supported. Work in progress.
 
-### Plans to do:
-- Add support Global State for React Class Components.
+### Features:
+- The library use React API for implementation the Global State feature.
+- Simple & Powerful work with Global State.
+- Allows to have seceral Global States.
+- It supports Functional & Class Components.
 
 ### 1. How to install
 
@@ -47,11 +50,37 @@ root.render(
 
 ```
 
-#### 2.2. Read / Update Global State
+#### 2.2. Read / Update Global State at Functional Components
 ```javascript
 import { useGlobalState } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
+
+    // Use useGlobalState<UserScopeInterface>('user') for TypeScript
+    const globalState = useGlobalState('user');
+    const [ name, setName ] = globalState.name; // like useState
+    const [ age, setAge ] = globalState.age; // like useState
+
+    const increaseAge = () => {
+        // `set function` has the same API like a `set function` from React.useState()
+        setAge((value) => value + 1);
+    }
+
+    return (
+        <div>
+            User Name: {name}
+            <br />
+            Age: {age} <button onClick={increaseAge}>+</button>
+        </div>
+    );
+}
+```
+
+#### 2.3. Read / Update Global State at Class Components
+```javascript
+import { useGlobalState } from '@cheprasov/react-global-state';
+
+const User extends React.C = () => {
 
     // Use useGlobalState<UserScopeInterface>('user') for TypeScript
     const globalState = useGlobalState('user');

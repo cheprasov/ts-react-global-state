@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 const path = require('path');
 
-module.exports = {
+const libConfig = {
     target: 'node',
     entry: './src/index.ts',
     output: {
@@ -36,3 +36,26 @@ module.exports = {
         },
     },
 };
+
+const demoConfig = {
+    target: 'node',
+    entry: './demo/index.tsx',
+    output: {
+        filename: 'index.js',
+        path: path.resolve(__dirname, 'demo/build/'),
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: [/node_modules/, /setupTests\.ts/, /\.test\./],
+            },
+        ],
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+    },
+};
+
+module.exports = [libConfig, demoConfig];
