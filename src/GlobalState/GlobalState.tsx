@@ -1,4 +1,5 @@
 import React, { useContext, Context, useState, Dispatch, SetStateAction, createElement } from 'react';
+import { stringify } from '../string/stringify';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
@@ -11,7 +12,7 @@ export const createStateDefiner = (obj: Record<string, any>) => {
         if (!obj.hasOwnProperty(key)) {
             continue;
         }
-        const k = JSON.stringify(key);
+        const k = stringify(key);
         body.push(`n[${k}] = u(o[${k}]);`);
     }
     body.push('return n;');
@@ -52,12 +53,18 @@ export const useGlobalState = <T extends Record<string, any>>
     return useContext(Context);
 };
 
-export const withGlobalState = (Component: React.ComponentProps<any>, name: string, propName: string = '') => {
-    const encodedName = JSON.stringify(name);
-    const encodedPropName = JSON.stringify(propName || `${name}GlobalScope`);
-    return new Function('u', 'c', 'C', 'p', `
-        var n = Object.assign({ [${encodedPropName}]: u(${encodedName}) }, p);
+export const withGlobalState = <P extends object>
+(Component: React.ComponentType<P>, scopeToProp: Record<string, string>): React.FC<P> => {
+    return new Function('u', 'c', 'C', 's', 'p', `
+        var o = {};
+        for (let k in s) {
+            if (!s.hasOwnProperty(k)) {
+                continue;
+            }
+            o[s[k]] = u(k);
+        }
+        var n = Object.assign(o, p);
         delete n.children;
         return c(C, n, p.children);
-    `).bind(null, useGlobalState, createElement, Component);
+    `).bind(null, useGlobalState, createElement, Component, { ...scopeToProp });
 }

@@ -228,6 +228,10 @@ const User: React.FC = () => {
 }
 ```
 
+#### 3.3 Using Global State at Class Components
+
+WIP
+
 ## Something does not work
 
 Feel free to fork project, fix bugs, write tests and finally request for pull

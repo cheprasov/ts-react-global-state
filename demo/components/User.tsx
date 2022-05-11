@@ -3,7 +3,7 @@ import { useGlobalState } from '../../src/GlobalState/GlobalState';
 
 const User: React.FC = () => {
 
-    const globalState = useGlobalState('user');
+    const userGlobalState = useGlobalState('user');
     // globalState = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
@@ -17,9 +17,12 @@ const User: React.FC = () => {
     //    age: useState(37)
     // }
 
-    const [ name, setName ] = globalState.name; // like useState
-    const [ city ] = globalState.city; // like useState
-    const [ age, setAge ] = globalState.age; // like useState
+    const [ name, setName ] = userGlobalState.name; // like useState
+    const [ city ] = userGlobalState.city; // like useState
+    const [ age, setAge ] = userGlobalState.age; // like useState
+
+    const configGlobalState = useGlobalState('config');
+    const [ env ] = configGlobalState.env; // like useState
 
     const increaseAge = () => {
         // `set function` has the same API like a `set function` from React.useState()
@@ -40,10 +43,11 @@ const User: React.FC = () => {
     useEffect(() => {
         // shows message if any of scope values is changed
         console.log('Some value of user scope is changed', name, city, age);
-    }, [globalState]);
+    }, [userGlobalState]);
 
     return (
         <div>
+            Env: {env} <br />
             User Name: {name} <br />
             City: {city} <br />
             Age: {age} <button onClick={decrementAge}>-</button> / <button onClick={increaseAge}>+</button>

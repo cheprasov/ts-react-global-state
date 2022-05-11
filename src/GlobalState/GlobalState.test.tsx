@@ -1,7 +1,15 @@
 import React from 'react';
-import { contextByName, createGlobalState, createStateDefiner, useGlobalState } from './GlobalState'
+import {
+    contextByName,
+    createGlobalState,
+    createStateDefiner,
+    useGlobalState,
+    withGlobalState,
+} from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { UserScopeInf } from '../../demo/types';
+import { GlobalStateType } from '../../dist';
 
 describe('GlobalState', () => {
 
@@ -188,6 +196,27 @@ return n;
                 expect(userAge?.textContent).toEqual(`${userScope.age + i}`);
                 expect(userScope).toEqual(scopeCopy);
             }
+        });
+    });
+
+    describe('withGlobalState', () => {
+        class User extends React.Component<{ userScope: GlobalStateType<UserScopeInf> }> {
+            render() {
+                if (!this.props.userScope) {
+                    return (<div className="User">No Scope</div>);
+                }
+                const [ name ] = this.props.userScope.name;
+                return (<div className="User">{ name }</div>);
+            }
+        }
+
+        it('should return function', () => {
+            expect(typeof withGlobalState(User, { user: 'userScope' })).toEqual('function');
+        });
+
+        it('should return a new function each time', () => {
+            expect(withGlobalState(User, { user: 'userScope' }))
+                .not.toBe(withGlobalState(User, { user: 'userScope' }));
         });
     });
 

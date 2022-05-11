@@ -1,13 +1,20 @@
 import React from 'react';
 import { useGlobalState } from '../../src/GlobalState/GlobalState';
-import { UserScopeInf } from '../types';
+import { ConfigScopeInf, UserScopeInf } from '../types';
 import UserClass from './UserClass';
 
-const WrappedUserClass = ({ children = undefined }) => {
+const WrappedUserClass: React.FC<React.PropsWithChildren<{}>> = ({ children = undefined }) => {
+    const configGlobalState = useGlobalState<ConfigScopeInf>('config');
     const userGlobalState = useGlobalState<UserScopeInf>('user');
 
     return (
-        <UserClass userGlobalState={userGlobalState}>{children}</UserClass>
+        <UserClass
+            role='Admin'
+            userGlobalState={userGlobalState}
+            configGlobalState={configGlobalState}
+        >
+            {children}
+        </UserClass>
     );
 }
 

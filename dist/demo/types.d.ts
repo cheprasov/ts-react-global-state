@@ -3,8 +3,7 @@ export interface UserScopeInf {
     city: string;
     age: number;
 }
-
 export interface ConfigScopeInf {
-    env: string; // prod, dev
+    env: string;
     lang: string;
 }

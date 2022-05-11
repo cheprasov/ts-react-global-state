@@ -11,4 +11,4 @@ export declare const createGlobalState: (name: string, scope: Record<string, Sta
     children?: React.ReactNode;
 }>;
 export declare const useGlobalState: <T extends Record<string, any>>(name: string) => { [P in keyof T]: [T[P], SetStateType<T[P]>]; };
-export declare const withGlobalState: (Component: React.ComponentProps<any>, name: string, propName?: string) => any;
+export declare const withGlobalState: <P extends object>(Component: React.ComponentType<P>, scopeToProp: Record<string, string>) => React.FC<P>;
