@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     contextByName,
     createGlobalState,
@@ -200,23 +200,114 @@ return n;
     });
 
     describe('withGlobalState', () => {
-        class User extends React.Component<{ userScope: GlobalStateType<UserScopeInf> }> {
+        const userScope = {
+            name: 'Alex',
+            city: 'London',
+            age: 37,
+        }
+        let UserGlobalState: any;
+
+        beforeAll(() => {
+            UserGlobalState = createGlobalState('user', { ...userScope });
+        });
+
+        afterAll(() => {
+            contextByName.clear();
+        });
+
+        class TestClass extends React.Component<React.PropsWithChildren<{ userScope?: GlobalStateType<UserScopeInf> }>> {
             render() {
                 if (!this.props.userScope) {
                     return (<div className="User">No Scope</div>);
                 }
                 const [ name ] = this.props.userScope.name;
-                return (<div className="User">{ name }</div>);
+                return (
+                    <>
+                        <div className="User">{ name }</div>
+                        <div className="Children">{ this.props.children }</div>
+                    </>
+                );
             }
         }
 
+        const Updater: React.FC<{newName: string}> = ({ newName }) => {
+            const globalState = useGlobalState<typeof userScope>('user');
+            const [ , setName ] = globalState.name;
+
+            const updateName = () => {
+                setName(newName);
+            }
+
+            return (
+                <div className="Updater">
+                    <button onClick={updateName}></button>
+                </div>
+            );
+        }
+
         it('should return function', () => {
-            expect(typeof withGlobalState(User, { user: 'userScope' })).toEqual('function');
+            expect(typeof withGlobalState(TestClass, { user: 'userScope' })).toEqual('function');
         });
 
         it('should return a new function each time', () => {
-            expect(withGlobalState(User, { user: 'userScope' }))
-                .not.toBe(withGlobalState(User, { user: 'userScope' }));
+            expect(withGlobalState(TestClass, { user: 'userScope' }))
+                .not.toBe(withGlobalState(TestClass, { user: 'userScope' }));
+        });
+
+        it('should not use Global State if withGlobalState is not used for Class Component', () => {
+            const { container } = render(
+                <UserGlobalState>
+                    <TestClass />
+                </UserGlobalState>
+            );
+            const userElement = container.querySelector('.User');
+            expect(userElement).not.toBeNull();
+            expect(userElement?.textContent).toEqual('No Scope');
+        });
+
+        it('should use Global State if withGlobalState is used for Class Component', () => {
+            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+            const { container } = render(
+                <UserGlobalState>
+                    <TestClassWithGlobalState />
+                </UserGlobalState>
+            );
+            const userElement = container.querySelector('.User');
+            expect(userElement).not.toBeNull();
+            expect(userElement?.textContent).toEqual(userScope.name);
+        });
+
+        it('should with children well if Class Component uses Global State', () => {
+            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+            const { container } = render(
+                <UserGlobalState>
+                    <TestClassWithGlobalState>
+                        Foo Bar
+                    </TestClassWithGlobalState>
+                </UserGlobalState>
+            );
+            const element = container.querySelector('.Children');
+            expect(element).not.toBeNull();
+            expect(element?.textContent).toEqual('Foo Bar');
+        });
+
+        it('should render new value if Global State scope is updated', async () => {
+            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+            const newName = `Super ${useState.name}`;
+            const { container } = render(
+                <UserGlobalState>
+                    <TestClassWithGlobalState />
+                    <Updater newName={newName} />
+                </UserGlobalState>
+            );
+            const userElement = container.querySelector('.User');
+            expect(userElement).not.toBeNull();
+            expect(userElement?.textContent).toEqual(userScope.name);
+
+            const button = container.querySelector('.Updater button') as Element;
+            await userEvent.click(button);
+
+            expect(userElement?.textContent).toEqual(newName);
         });
     });
 
