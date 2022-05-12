@@ -81,28 +81,45 @@ const User: React.FC = () => {
 
 #### 2.3. Read / Update Global State at Class Components
 ```javascript
-import { useGlobalState } from '@cheprasov/react-global-state';
+import React from 'react';
+import { withGlobalState } from '@cheprasov/react-global-state';
 
-const User extends React.C = () => {
+class UserClass extends React.Component {
 
-    // Use useGlobalState<UserScopeInterface>('user') for TypeScript
-    const globalState = useGlobalState('user');
-    const [ name, setName ] = globalState.name; // like useState
-    const [ age, setAge ] = globalState.age; // like useState
-
-    const increaseAge = () => {
-        // `set function` has the same API like a `set function` from React.useState()
-        setAge((value) => value + 1);
+    increaseAge = () => {
+        if (this.props.userGlobalState) {
+            const [ , setAge ] = this.props.userGlobalState.age;
+            setAge((value: number) => value + 1);
+        }
     }
 
-    return (
-        <div>
-            User Name: {name}
-            <br />
-            Age: {age} <button onClick={increaseAge}>+</button>
-        </div>
-    );
+    render() {
+        if (!this.props.userGlobalState) {
+            return (
+                <div>
+                    User Scope is not provided
+                </div>
+            );
+        }
+
+        const [ name ] = this.props.userGlobalState.name; // like useState
+        const [ city ] = this.props.userGlobalState.city; // like useState
+        const [ age ] = this.props.userGlobalState.age; // like useState
+
+        return (
+            <div>
+                Name: {name} <br />
+                City: {city} <br />
+                Age: {age} <button onClick={this.increaseAge}>+</button> <br />
+            </div>
+        );
+    }
 }
+
+const UserClassWithGlobalState = withGlobalState(UserClass, { user: 'userGlobalState' });
+
+export { UserClassWithGlobalState as UserClass };
+
 ```
 
 Please see more examples at [demo folder](/demo/).
