@@ -8,7 +8,7 @@ import {
 } from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { UserScopeInf } from '../../demo/types';
+import { ConfigScopeInf, UserScopeInf } from '../../demo/types';
 import { GlobalStateType } from '../../dist';
 
 describe('GlobalState', () => {
@@ -200,10 +200,14 @@ return n;
     });
 
     describe('withGlobalState', () => {
-        const userScope = {
+        const userScope: UserScopeInf = {
             name: 'Alex',
             city: 'London',
             age: 37,
+        }
+        const configScope: ConfigScopeInf = {
+            lang: 'English',
+            env: 'test',
         }
         let UserGlobalState: any;
 
@@ -225,6 +229,25 @@ return n;
                     <>
                         <div className="User">{ name }</div>
                         <div className="Children">{ this.props.children }</div>
+                    </>
+                );
+            }
+        }
+
+        class TestClass2 extends React.Component<React.PropsWithChildren<{
+            userScope?: GlobalStateType<UserScopeInf>,
+            configScope?: GlobalStateType<ConfigScopeInf>
+        }>> {
+            render() {
+                if (!this.props.userScope || !this.props.configScope) {
+                    return (<div className="User">No Scope</div>);
+                }
+                const [ name ] = this.props.userScope.name;
+                const [ lang ] = this.props.configScope.lang;
+                return (
+                    <>
+                        <div className="User">{ name }</div>
+                        <div className="Language">{ lang }</div>
                     </>
                 );
             }
@@ -292,7 +315,7 @@ return n;
         });
 
         it('should render new value if Global State scope is updated', async () => {
-            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' });
             const newName = `Super ${useState.name}`;
             const { container } = render(
                 <UserGlobalState>
@@ -308,6 +331,20 @@ return n;
             await userEvent.click(button);
 
             expect(userElement?.textContent).toEqual(newName);
+        });
+
+        it('should allow to use several Global States at Class Components', () => {
+            const ConfigGlobalState = createGlobalState('config', configScope);
+            const TestClassWithGlobalState = withGlobalState(TestClass2, { user: 'userScope', config: 'configScope' });
+            const { container } = render(
+                <ConfigGlobalState>
+                    <UserGlobalState>
+                        <TestClassWithGlobalState />
+                    </UserGlobalState>
+                </ConfigGlobalState>
+            );
+            expect(container.querySelector('.User')?.textContent).toEqual(userScope.name);
+            expect(container.querySelector('.Language')?.textContent).toEqual(configScope.lang);
         });
     });
 
