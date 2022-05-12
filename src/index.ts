@@ -1,1 +1,6 @@
-export { createGlobalState, useGlobalState } from './GlobalState/GlobalState';
+export {
+    createGlobalState,
+    useGlobalState,
+    withGlobalState,
+    GlobalStateType,
+} from './GlobalState/GlobalState';

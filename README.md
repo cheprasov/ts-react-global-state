@@ -1,14 +1,20 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v1.0.0)
+@cheprasov/react-global-state (v1.1.0)
 =========
 
 The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
 
 **Note:** Currently React Class Components are not supported. Work in progress.
 
-### Plans to do:
-- Add support Global State for React Class Components.
+### Features:
+- The library use React API for implementation the Global State feature.
+- Simple & Powerful work with Global State.
+- Allows to have seceral Global States.
+- It supports Functional & Class Components.
+
+### Ideas to do:
+- Create a function for generation nested Global States easy.
 
 ### 1. How to install
 
@@ -47,7 +53,7 @@ root.render(
 
 ```
 
-#### 2.2. Read / Update Global State
+#### 2.2. Read / Update Global State at Functional Components
 ```javascript
 import { useGlobalState } from '@cheprasov/react-global-state';
 
@@ -72,6 +78,51 @@ const User: React.FC = () => {
     );
 }
 ```
+
+#### 2.3. Read / Update Global State at Class Components
+```javascript
+import React from 'react';
+import { withGlobalState } from '@cheprasov/react-global-state';
+
+class UserClass extends React.Component {
+
+    increaseAge = () => {
+        if (this.props.userGlobalState) {
+            const [ , setAge ] = this.props.userGlobalState.age;
+            setAge((value: number) => value + 1);
+        }
+    }
+
+    render() {
+        if (!this.props.userGlobalState) {
+            return (
+                <div>
+                    User Scope is not provided
+                </div>
+            );
+        }
+
+        const [ name ] = this.props.userGlobalState.name; // like useState
+        const [ city ] = this.props.userGlobalState.city; // like useState
+        const [ age ] = this.props.userGlobalState.age; // like useState
+
+        return (
+            <div>
+                Name: {name} <br />
+                City: {city} <br />
+                Age: {age} <button onClick={this.increaseAge}>+</button> <br />
+            </div>
+        );
+    }
+}
+
+const UserClassWithGlobalState = withGlobalState(UserClass, { user: 'userGlobalState' });
+
+export { UserClassWithGlobalState as UserClass };
+
+```
+
+Please see more examples at [demo folder](/demo/).
 
 ### 3. Documentation
 
@@ -197,6 +248,83 @@ const User: React.FC = () => {
         </div>
     );
 }
+```
+
+#### 3.3 Using Global State at Class Components
+
+For using Global State with Class Component please wrap the Class Component at Functional Component and provide Global State like a property.
+
+Example:
+```javascript
+export default class UserClass extends React.Component<React.PropsWithChildren<UserProps>> {
+
+    increaseAge = () => {
+        if (this.props.userGlobalState) {
+            const [ , setAge ] = this.props.userGlobalState.age;
+            setAge((value: number) => value + 1);
+        }
+    }
+
+    render() {
+        if (!this.props.userGlobalState) {
+            return (
+                <div>
+                    User Scope is not provided
+                </div>
+            );
+        }
+
+        const [ name ] = this.props.userGlobalState.name; // like useState
+        const [ city ] = this.props.userGlobalState.city; // like useState
+        const [ age ] = this.props.userGlobalState.age; // like useState
+
+        return (
+            <div>
+                Name: {name} <br />
+                City: {city} <br />
+                Age: {age} <button onClick={this.increaseAge}>+</button> <br />
+            </div>
+        );
+    }
+}
+```
+
+```javascript
+const WrappedUserClass = ({ children = undefined }) => {
+    const userState = useGlobalState('user');
+
+    // you can use as many Global States as you need.
+
+    return (
+        <UserClass
+            userState={userState}
+        >
+            {children}
+        </UserClass>
+    );
+};
+```
+
+Or use HOC function `withGlobalState` that wraps your Class Component automatically for useing Global State.
+
+```typescript
+withGlobalState(Component: React.Component, scopeToProp: Record<string, string> ) // Returns Higher-Order Component
+```
+
+**Params:**
+ - Component: `React.Component` - React.Component for wrapping at Global State.
+ - scopeToProp: `Record<string, string>` - Object, where Key is a Global State scope name and Value is name of property that will be used to pass the Global State to the Component. It is allowed to use multiple scopes.
+
+**Returns:**
+- Returns Higher-Order Component
+
+**Examples:**
+
+```javascript
+export const UserClassWithGlobalState = withGlobalState(
+    UserClass, // Original Class, please see above
+    { user: 'userGlobalState' }, // <Global Scope Name for key>: <Class Property Name for value>
+);
 ```
 
 ## Something does not work

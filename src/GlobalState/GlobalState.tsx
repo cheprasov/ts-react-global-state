@@ -1,8 +1,10 @@
-import React, { useContext, Context, useState, Dispatch, SetStateAction } from 'react';
+import React, { useContext, Context, useState, Dispatch, SetStateAction, createElement } from 'react';
+import { stringify } from '../string/stringify';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
-export type StateTuple<T> = [T, SetStateType<T>];
+export type StateTupleType<T> = [T, SetStateType<T>];
+export type GlobalStateType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
 
 export const createStateDefiner = (obj: Record<string, any>) => {
     const body: string[] = [`var n = {};`];
@@ -10,12 +12,12 @@ export const createStateDefiner = (obj: Record<string, any>) => {
         if (!obj.hasOwnProperty(key)) {
             continue;
         }
-        const k = JSON.stringify(key);
+        const k = stringify(key);
         body.push(`n[${k}] = u(o[${k}]);`);
     }
     body.push('return n;');
     return new Function('o', 'u', body.join('\n')) as (
-        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTuple<any>>
+        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTupleType<any>>
     );
 }
 
@@ -50,3 +52,19 @@ export const useGlobalState = <T extends Record<string, any>>
     }
     return useContext(Context);
 };
+
+export const withGlobalState = <P extends object>
+(Component: React.ComponentType<P>, scopeToProp: Record<string, string>): React.FC<P> => {
+    return new Function('u', 'c', 'C', 's', 'p', `
+        var o = {};
+        for (let k in s) {
+            if (!s.hasOwnProperty(k)) {
+                continue;
+            }
+            o[s[k]] = u(k);
+        }
+        var n = Object.assign(o, p);
+        delete n.children;
+        return c(C, n, p.children);
+    `).bind(null, useGlobalState, createElement, Component, { ...scopeToProp });
+}
