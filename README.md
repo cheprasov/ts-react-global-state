@@ -5,8 +5,6 @@
 
 The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
 
-**Note:** Currently React Class Components are not supported. Work in progress.
-
 ### Features:
 - The library use React API for implementation the Global State feature.
 - Simple & Powerful work with Global State.
