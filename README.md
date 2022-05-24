@@ -1,6 +1,6 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v1.1.0)
+@cheprasov/react-global-state (v1.2.0)
 =========
 
 The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.

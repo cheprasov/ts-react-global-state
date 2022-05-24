@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createGlobalState } from '../src/GlobalState/GlobalState';
+import { createGlobalState } from '../../src/GlobalState/GlobalState';
 import App from './App';
 import type { ConfigScopeInf } from './types';
 

@@ -1,5 +1,13 @@
 # Changelog
 
+
+## [1.2.0] - Unreleased
+
+### Added
+
+- Added function `createMultiGlobalStates` for creating multi and/or nested scopes.
+- Added otional param `useScope` for `createGlobalState` that allows to have references through scopes.
+
 ## [1.1.0] - 2022-05-12
 
 ### Added

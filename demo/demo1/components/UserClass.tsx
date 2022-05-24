@@ -1,5 +1,5 @@
 import React from 'react';
-import { GlobalStateType, withGlobalState } from '../../src/GlobalState/GlobalState';
+import { GlobalStateType, withGlobalState } from '../../../src/GlobalState/GlobalState';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 
 interface UserProps {

@@ -1,6 +1,6 @@
 {
     "name": "@cheprasov/react-global-state",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "author": "Alexander Cheprasov",
     "description": "The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.",
     "keywords": [
@@ -21,7 +21,8 @@
         "@types/react": "^18.0.8",
         "@types/react-dom": "^18.0.0",
         "react": "^18.1.0",
-        "react-dom": "^18.1.0"
+        "react-dom": "^18.1.0",
+        "@cheprasov/data-structures": "../ts-data-structures"
     },
     "devDependencies": {
         "@testing-library/react": "^13.1.1",

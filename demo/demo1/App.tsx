@@ -1,5 +1,5 @@
 import React from 'react';
-import { createGlobalState } from '../src/GlobalState/GlobalState';
+import { createGlobalState } from '../../src/GlobalState/GlobalState';
 import User from './components/User';
 import UserClass, { UserClassWithGlobalState } from './components/UserClass';
 import WrappedUserClass from './components/WrappedUserClass'
@@ -11,7 +11,7 @@ const userScope: UserScopeInf = {
   age: 37,
 }
 
-const UserGlobalState = createGlobalState('user',  userScope);
+const UserGlobalState = createGlobalState('user',  userScope, { config: 'config' });
 
 function App() {
   return (

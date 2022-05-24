@@ -39,9 +39,12 @@ const libConfig = {
 
 const demoConfig = {
     target: 'node',
-    entry: './demo/index.tsx',
+    entry: {
+        'demo1': './demo/demo1/index.tsx',
+        'demo2': './demo/demo2/index.tsx',
+    },
     output: {
-        filename: 'index.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'demo/build/'),
     },
     module: {
