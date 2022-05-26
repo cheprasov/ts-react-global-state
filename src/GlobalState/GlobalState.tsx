@@ -16,7 +16,7 @@ export interface ScopeVariablesInf {
 export const createStateDefiner = (obj: Record<string, any>) => {
     const body: string[] = [`var n = {};`];
     for (const key in obj) {
-        if (!obj.hasOwnProperty(key)) {
+        if (!obj.hasOwnProperty(key) || key === '$$_scopeType') {
             continue;
         }
         const k = stringify(key);
