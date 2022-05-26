@@ -8,7 +8,7 @@ import {
 } from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ConfigScopeInf, UserScopeInf } from '../../demo/types';
+import { ConfigScopeInf, UserScopeInf } from '../../demo/demo1/types';
 import { GlobalStateType } from '../../dist';
 
 describe('GlobalState', () => {

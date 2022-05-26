@@ -1,4 +1,5 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
+import { ScopeInf } from './Scope';
 export declare type StateValueType<T> = T | (() => T);
 export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
 export declare type StateTupleType<T> = [T, SetStateType<T>];
@@ -8,16 +9,13 @@ export declare type GlobalStateType<T> = {
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
 }
-export interface ScopeInf {
-    $$_scopeType: 'scope';
-}
 export declare const createStateDefiner: (obj: Record<string, any>) => (obj: Record<string, any>, use: typeof useState) => Record<string, StateTupleType<any>>;
 export declare const contextByName: Map<string, React.Context<any>>;
 export declare const createGlobalState: (name: string, scope: Record<string, StateValueType<any>>, useScope?: Record<string, string>) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
 interface MultiStope {
-    [key: string]: any | MultiStope;
+    [key: string]: any | MultiStope & ScopeInf;
 }
 export declare const createMultiGlobalStates: (scopes: MultiStope) => React.NamedExoticComponent<{
     children?: React.ReactNode;

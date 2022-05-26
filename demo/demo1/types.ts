@@ -1,5 +1,3 @@
-import { ScopeInf } from '../../src/GlobalState/GlobalState';
-
 export interface UserScopeInf {
     name: string;
     city: string;

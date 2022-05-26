@@ -1,23 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createMultiGlobalStates } from '../../src/GlobalState/GlobalState';
+import { Scope } from '../../src/GlobalState/Scope';
 import App from './App';
 
 const nestedScope = {
-  app: {
-    settings: {
+  app: Scope({
+    settings: Scope({
       priceType: 'total' // total | perPerson
-    },
-    user: {
+    }),
+    user: Scope({
       name: 'Alex',
       city: 'London',
       age: 37,
-      hobby: {
+      hobby: Scope({
         chess: 'beginner',
         it: 'expert',
-      },
-    },
-    search: {
+      }),
+    }),
+    search: Scope({
       departure: 'London',
       destination: 'Paris',
       date: Date.now(),
@@ -25,15 +26,15 @@ const nestedScope = {
         { adult: 2 },
       ],
       nights: 7,
-      filters: {
+      filters: Scope({
         rating: 5,
         price: {
           min: 0,
           max: 1000,
         },
-      }
-    }
-  },
+      }),
+    }),
+  }),
 };
 
 const AppNestedState = createMultiGlobalStates(nestedScope);
