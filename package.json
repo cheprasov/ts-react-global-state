@@ -22,7 +22,7 @@
         "@types/react-dom": "^18.0.0",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
-        "@cheprasov/data-structures": "../ts-data-structures"
+        "@cheprasov/data-structures": "^0.1.0"
     },
     "devDependencies": {
         "@testing-library/react": "^13.1.1",

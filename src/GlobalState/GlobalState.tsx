@@ -6,7 +6,7 @@ import { isScope, ScopeInf } from './Scope';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
-export type StateTupleType<T> = [T, SetStateType<T>];
+export type StateTupleType<T> = [T, SetStateType<T> | undefined];
 export type GlobalStateType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
 
 export interface ScopeVariablesInf {
@@ -38,19 +38,27 @@ export const createGlobalState = (
     if (contextByName.has(name)) {
         throw new Error(`GlobalState scope '${name}' already exists`)
     }
-    const initScope = { ...scope };
+
+    const scopeCopy = { ...scope };
+
+    const initScope = Object.entries(scopeCopy).reduce((acc, [key, value]) => {
+        acc[key] = [value, undefined];
+        return acc;
+    }, {} as Record<string, any>);
+
     const initUseScope = Object.entries(useScope);
     initUseScope.forEach(([key]) => {
+        delete scopeCopy[key];
         delete initScope[key];
     });
 
     const Context = React.createContext(initScope);
     contextByName.set(name, Context);
 
-    const stateDefiner = createStateDefiner(initScope);
+    const stateDefiner = createStateDefiner(scopeCopy);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-        const scopeValues: ScopeVariablesInf = stateDefiner(initScope, useState);
+        const scopeValues: ScopeVariablesInf = stateDefiner(scopeCopy, useState);
         initUseScope.forEach(([key, scopeName]) => {
             scopeValues[key] = useGlobalState(scopeName);
         });
@@ -112,7 +120,7 @@ export const createMultiGlobalStates = (scopes: MultiStope) => {
             return children;
         },
         (result, node: MultiStope | ScopeNode) => {
-            if (node.$$_scopeType === 'scope') {
+            if (isScopeNode(node)) {
                 result.push(node);
             }
             return result;

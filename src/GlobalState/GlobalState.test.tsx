@@ -10,6 +10,7 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigScopeInf, UserScopeInf } from '../../demo/demo1/types';
 import { GlobalStateType } from '../../dist';
+import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
 
 describe('GlobalState', () => {
 
@@ -89,6 +90,14 @@ return n;
     });
 
     describe('createGlobalState', () => {
+        const appScope = {
+            foo: 'bar',
+        };
+        const userScope = {
+            name: 'Alex',
+            city: 'London',
+            age: 37,
+        }
         afterEach(() => {
             contextByName.clear();
         });
@@ -103,6 +112,56 @@ return n;
             expect(() => {
                 createGlobalState('user', { foo: 'bar' });
             }).toThrowError("GlobalState scope 'user' already exists");
+        });
+
+        it('should attach nested scope', () => {
+            const UserGlobalState = createGlobalState('user', userScope);
+            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+
+            const Component: React.FC<{}> = () => {
+                const app = useGlobalState('app');
+                return (<div className="output">{JSON.stringify(app)}</div>);
+            };
+
+            const wrapper = render(
+                <ComponentWrapper components={[UserGlobalState, AppGlobalState]}>
+                    <Component />
+                </ComponentWrapper>
+            );
+            const elem = wrapper.container.querySelector('.output');
+            expect(JSON.parse(elem?.textContent || '')).toEqual({
+                foo: ['bar', null],
+                user: {
+                    name: ['Alex', null],
+                    city: ['London', null],
+                    age: [37, null],
+                }}
+            );
+        });
+
+        it('should use default values if nested GlobalScope is not rendered', () => {
+            const UserGlobalState = createGlobalState('user', userScope);
+            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+
+            const Component: React.FC<{}> = () => {
+                const app = useGlobalState('app');
+                return (<div className="output">{JSON.stringify(app)}</div>);
+            };
+
+            const wrapper = render(
+                <ComponentWrapper components={[AppGlobalState]}>
+                    <Component />
+                </ComponentWrapper>
+            );
+            const elem = wrapper.container.querySelector('.output');
+            expect(JSON.parse(elem?.textContent || '')).toEqual({
+                foo: ['bar', null],
+                user: {
+                    name: ['Alex', null],
+                    city: ['London', null],
+                    age: [37, null],
+                }}
+            );
         });
     });
 

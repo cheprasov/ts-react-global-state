@@ -2,7 +2,7 @@ import React, { useState, Dispatch, SetStateAction } from 'react';
 import { ScopeInf } from './Scope';
 export declare type StateValueType<T> = T | (() => T);
 export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
-export declare type StateTupleType<T> = [T, SetStateType<T>];
+export declare type StateTupleType<T> = [T, SetStateType<T> | undefined];
 export declare type GlobalStateType<T> = {
     [P in keyof T]: [T[P], SetStateType<T[P]>];
 };
