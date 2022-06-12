@@ -14,10 +14,10 @@ export declare const contextByName: Map<string, React.Context<any>>;
 export declare const createGlobalState: (name: string, scope: Record<string, StateValueType<any>>, useScope?: Record<string, string>) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
-interface MultiStope {
-    [key: string]: any | MultiStope & ScopeInf;
+interface MultiScope {
+    [key: string]: any | MultiScope & ScopeInf;
 }
-export declare const createMultiGlobalStates: (scopes: MultiStope) => React.NamedExoticComponent<{
+export declare const createMultiGlobalStates: (scopes: MultiScope) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
 declare type ReturnUseGlobalState<T extends {}> = {

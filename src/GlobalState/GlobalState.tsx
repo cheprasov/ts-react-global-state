@@ -72,24 +72,24 @@ export const createGlobalState = (
     return React.memo(ContextNode);
 };
 
-interface MultiStope {
-    [key: string]: any | MultiStope & ScopeInf;
+interface MultiScope {
+    [key: string]: any | MultiScope & ScopeInf;
 }
 
 interface ScopeNode {
     $$_scopeType: string;
     name: string;
-    scope: MultiStope;
+    scope: MultiScope;
     parent: ScopeNode | null;
     useScopes: Record<string, string>;
 }
 
-const isScopeNode = (node: ScopeNode | MultiStope): node is ScopeNode => {
+const isScopeNode = (node: ScopeNode | MultiScope): node is ScopeNode => {
     return node.$$_scopeType === 'scope';
 }
 
-export const createMultiGlobalStates = (scopes: MultiStope) => {
-    const linerScopes = Tree.levelOrderTreeTraversal<MultiStope | ScopeNode, any[]>(
+export const createMultiGlobalStates = (scopes: MultiScope) => {
+    const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | ScopeNode, any[]>(
         scopes,
         (node) => {
             const children: ScopeNode[] = [];
@@ -119,7 +119,7 @@ export const createMultiGlobalStates = (scopes: MultiStope) => {
             }
             return children;
         },
-        (result, node: MultiStope | ScopeNode) => {
+        (result, node: MultiScope | ScopeNode) => {
             if (isScopeNode(node)) {
                 result.push(node);
             }
