@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     contextByName,
     createGlobalState,
+    createMultiGlobalStates,
     createStateDefiner,
     useGlobalState,
     withGlobalState,
 } from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ConfigScopeInf, UserScopeInf } from '../../demo/types';
+import { ConfigScopeInf, UserScopeInf } from '../../demo/demo1/types';
 import { GlobalStateType } from '../../dist';
+import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
+import { Scope } from './Scope';
 
 describe('GlobalState', () => {
 
@@ -89,6 +92,14 @@ return n;
     });
 
     describe('createGlobalState', () => {
+        const appScope = {
+            foo: 'bar',
+        };
+        const userScope = {
+            name: 'Alex',
+            city: 'London',
+            age: 37,
+        }
         afterEach(() => {
             contextByName.clear();
         });
@@ -103,6 +114,56 @@ return n;
             expect(() => {
                 createGlobalState('user', { foo: 'bar' });
             }).toThrowError("GlobalState scope 'user' already exists");
+        });
+
+        it('should attach nested scope', () => {
+            const UserGlobalState = createGlobalState('user', userScope);
+            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+
+            const Component: React.FC<{}> = () => {
+                const app = useGlobalState('app');
+                return (<div className="output">{JSON.stringify(app)}</div>);
+            };
+
+            const wrapper = render(
+                <ComponentWrapper components={[UserGlobalState, AppGlobalState]}>
+                    <Component />
+                </ComponentWrapper>
+            );
+            const elem = wrapper.container.querySelector('.output');
+            expect(JSON.parse(elem?.textContent || '')).toEqual({
+                foo: ['bar', null],
+                user: {
+                    name: ['Alex', null],
+                    city: ['London', null],
+                    age: [37, null],
+                }}
+            );
+        });
+
+        it('should use default values if nested GlobalScope is not rendered', () => {
+            const UserGlobalState = createGlobalState('user', userScope);
+            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+
+            const Component: React.FC<{}> = () => {
+                const app = useGlobalState('app');
+                return (<div className="output">{JSON.stringify(app)}</div>);
+            };
+
+            const wrapper = render(
+                <ComponentWrapper components={[AppGlobalState]}>
+                    <Component />
+                </ComponentWrapper>
+            );
+            const elem = wrapper.container.querySelector('.output');
+            expect(JSON.parse(elem?.textContent || '')).toEqual({
+                foo: ['bar', null],
+                user: {
+                    name: ['Alex', null],
+                    city: ['London', null],
+                    age: [37, null],
+                }}
+            );
         });
     });
 
@@ -346,6 +407,153 @@ return n;
             expect(container.querySelector('.User')?.textContent).toEqual(userScope.name);
             expect(container.querySelector('.Language')?.textContent).toEqual(configScope.lang);
         });
+    });
+
+    describe('createMultiGlobalStates', () => {
+        beforeEach(() => {
+            contextByName.clear();
+        });
+
+        it('should create several global states', () => {
+            const GlobalStates = createMultiGlobalStates({
+                foo: Scope({ value: 42 }),
+                bar: Scope({ value: 10 }),
+                baz: Scope({ value: 33 }),
+            });
+
+            expect(contextByName.has('foo')).toEqual(true);
+            expect(contextByName.has('bar')).toEqual(true);
+            expect(contextByName.has('baz')).toEqual(true);
+        });
+
+        it('should create global states only for scoped objects', () => {
+            const GlobalStates = createMultiGlobalStates({
+                foo: { value: 42 },
+                bar: { value: 10 },
+                baz: Scope({ value: 33 }),
+            });
+
+            expect(contextByName.has('foo')).toEqual(false);
+            expect(contextByName.has('bar')).toEqual(false);
+            expect(contextByName.has('baz')).toEqual(true);
+        });
+
+        it('should create nested scope', () => {
+            const GlobalStates = createMultiGlobalStates({
+                foo: Scope({
+                    value: 42,
+                    bar: Scope({
+                        value: 10,
+                        baz: Scope({
+                            value: 33
+                        }),
+                    }),
+                }),
+            });
+
+            const Component: React.FC<{}> = () => {
+                const foo = useGlobalState('foo');
+                return (<div className="output">{JSON.stringify(foo)}</div>);
+            };
+
+            const wrapper = render(
+                <GlobalStates>
+                    <Component />
+                </GlobalStates>
+            );
+            const elem = wrapper.container.querySelector('.output');
+            expect(JSON.parse(elem?.textContent || '')).toEqual({
+                value: [42, null],
+                bar: {
+                    value: [10, null],
+                    baz: {
+                        value: [33, null],
+                    }
+                },
+            });
+        });
+
+        it('should update parent scope if child scope is updated', async () => {
+            const initState = {
+                foo: Scope({
+                    value: 42,
+                    bar: Scope({
+                        value: 10,
+                        baz: Scope({
+                            value: 33
+                        }),
+                    }),
+                }),
+            };
+            const GlobalStates = createMultiGlobalStates(initState);
+
+            const testFunction = jest.fn();
+
+            const Component: React.FC<{}> = () => {
+                const foo = useGlobalState('foo');
+                useEffect(() => {
+                    testFunction(JSON.parse(JSON.stringify(foo)));
+                }, [foo]);
+                return (<div className="output">{JSON.stringify(foo)}</div>);
+            };
+
+            const Component2: React.FC<{}> = () => {
+                const { value: [ value, setValue ] } = useGlobalState<typeof initState.foo.bar.baz>('baz');
+                const onClick = () => {
+                    setValue(v => v + 1);
+                };
+                return (<button onClick={onClick} />);
+            };
+
+            const wrapper = render(
+                <GlobalStates>
+                    <Component />
+                    <Component2 />
+                </GlobalStates>
+            );
+
+            expect(testFunction).toHaveBeenCalledTimes(1);
+            expect(testFunction).toHaveBeenCalledWith({
+                value: [42, null],
+                bar: {
+                    value: [10, null],
+                    baz: {
+                        value: [33, null],
+                    }
+                },
+            });
+
+            const button = wrapper.container.querySelector('button') as HTMLButtonElement;
+
+            testFunction.mockClear();
+            await userEvent.click(button);
+
+            expect(testFunction).toHaveBeenCalledTimes(1);
+            expect(testFunction).toHaveBeenCalledWith({
+                value: [42, null],
+                bar: {
+                    value: [10, null],
+                    baz: {
+                        value: [34, null],
+                    }
+                },
+            });
+
+            testFunction.mockClear();
+            await userEvent.click(button);
+
+            expect(testFunction).toHaveBeenCalledTimes(1);
+            expect(testFunction).toHaveBeenCalledWith({
+                value: [42, null],
+                bar: {
+                    value: [10, null],
+                    baz: {
+                        value: [35, null],
+                    }
+                },
+            });
+        });
+
     });
 
 });

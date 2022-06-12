@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalState } from '../../src/GlobalState/GlobalState';
+import { useGlobalState } from '../../../src/GlobalState/GlobalState';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 import UserClass from './UserClass';
 

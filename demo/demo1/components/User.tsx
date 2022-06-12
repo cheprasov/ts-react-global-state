@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { useGlobalState } from '../../src/GlobalState/GlobalState';
+import { useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { ConfigScopeInf, UserScopeInf } from '../types';
 
 const User: React.FC = () => {
 
-    const userGlobalState = useGlobalState('user');
+    const userGlobalState = useGlobalState<UserScopeInf>('user');
     // globalState = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
@@ -21,7 +22,8 @@ const User: React.FC = () => {
     const [ city ] = userGlobalState.city; // like useState
     const [ age, setAge ] = userGlobalState.age; // like useState
 
-    const configGlobalState = useGlobalState('config');
+
+    const configGlobalState = useGlobalState<ConfigScopeInf>('config');
     const [ env ] = configGlobalState.env; // like useState
 
     const increaseAge = () => {

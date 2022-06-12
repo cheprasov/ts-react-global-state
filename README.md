@@ -1,18 +1,17 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v1.1.0)
+@cheprasov/react-global-state (v1.2.0)
 =========
 
-The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
+The library allows to manage global state and nested global states easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
 
 ### Features:
 - The library use React API for implementation the Global State feature.
 - Simple & Powerful work with Global State.
-- Allows to have seceral Global States.
+- Allows to have several Global States and nested Global States.
 - It supports Functional & Class Components.
-
-### Ideas to do:
-- Create a function for generation nested Global States easy.
+- Easy to learn and use.
+- Written on TypeScript and support types.
 
 ### 1. How to install
 
@@ -36,7 +35,7 @@ const userScope = {
     name: 'Alex',
     city: 'London',
     age: 37,
-}
+};
 
 const GlobalState = createGlobalState('user', userScope); // return React.FunctionComponent
 
@@ -324,6 +323,109 @@ export const UserClassWithGlobalState = withGlobalState(
     { user: 'userGlobalState' }, // <Global Scope Name for key>: <Class Property Name for value>
 );
 ```
+
+#### 3.4 Creating Nested Global Scopes
+```typescript
+createMultiGlobalStates(scopes: Object) // Returns React.memo(React.FunctionalComponent)
+```
+Please note, the `createMultiGlobalStates` should be called once and outside a component implementation.
+
+**Params:**
+ - scopes: `Object` - An object that will be used for creating key/values for scopes. The original object will be never changed. Allowed to have nested scopes.
+
+ Please note, for creating nested objects like a scope, the object should be wrapped by `Scope()` function.
+
+**Returns:**
+ - `React.FunctionalComponent` (Wrapped by React.memo). It should be used inside your application (at any render level) for initialisation Global State feature for children components.
+
+**Examples:**
+```typescript
+
+import { Scope } from '@cheprasov/react-global-state';
+
+const nestedScope = {
+  app: Scope({
+    settings: Scope({
+      priceType: 'total',
+    }),
+    user: Scope({
+      name: 'Alex',
+      city: 'London',
+      age: 37,
+      hobby: { // Not a scope
+        chess: 'beginner',
+        it: 'expert',
+      },
+    }),
+    search: Scope({
+      departure: 'London',
+      destination: 'Paris',
+      date: Date.now(),
+      rooms: [
+        { adult: 2 },
+      ],
+      nights: 7,
+      filters: Scope({
+        rating: 5,
+        price: {
+          min: 0,
+          max: 1000,
+        },
+      }),
+    }),
+  }),
+};
+
+const GlobalStates = createMultiGlobalStates(nestedScope);
+
+root.render(
+    <GlobalStates>
+      <App />
+    </GlobalStates>
+);
+```
+Use:
+```typescript
+
+import { useGlobalState } from '@cheprasov/react-global-state';
+
+const App: React.FC = () => {
+
+    const app = useGlobalState('app');
+
+    const [ departure, setDeparture ] = app.search.departure; // like useState
+
+    // if you need only nested scope like filters
+    const filters = useGlobalState;('filters')
+        const [ rating, setRating ] = filters.rating; // like useState
+
+    useEffect(() => {
+        console.log('Any property of the app scope or any nested scope is updated');
+    }, [app]);
+
+     useEffect(() => {
+        console.log('Any property of the app.search scope or any nested scope if app.search is updated');
+    }, [app.search]);
+
+     useEffect(() => {
+        console.log('Any property of the app.search.filters scope is updated');
+    }, [app.search.filter]);
+
+    useEffect(() => {
+        console.log('Rating property of the app.search.filters scope is updated');
+    }, [app.search.filter.rating[0]]);
+
+    return (
+        <div className="App">
+            <SomeComponents>
+                ...
+            </SomeComponents>
+            ...
+        </div>
+    );
+}
+```
+
 
 ## Something does not work
 

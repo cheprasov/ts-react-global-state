@@ -27,7 +27,7 @@
     ],
     "exclude": [
         "node_modules",
-        "demo/index.tsx",
+        "demo",
         "**/setupTests.ts",
         "**/*.test.ts",
         "**/*.test.tsx",
