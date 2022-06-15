@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
-import { useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { useGlobalScope } from '../../../src/GlobalState/GlobalState';
 import { AppNestedScopeInf } from '../types';
 import Hobby from './Hobby';
 
 const User: React.FC = () => {
-    const userState = useGlobalState<AppNestedScopeInf['app']['user']>('user');
+    const userState = useGlobalScope<AppNestedScopeInf['app']['user']>('user');
     const [ name, setName ] = userState.name; // like useState
     const [ city ] = userState.city; // like useState
     const [ age, setAge ] = userState.age; // like useState

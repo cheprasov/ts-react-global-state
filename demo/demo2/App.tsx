@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { useGlobalState } from '../../src/GlobalState/GlobalState';
+import { useGlobalScope } from '../../src/GlobalState/GlobalState';
 import Search from './components/Search';
 import Settings from './components/Settings';
 import User from './components/User';
 import { AppNestedScopeInf } from './types';
 
 function App() {
-  const appState = useGlobalState<AppNestedScopeInf['app']>('app');
+  const appState = useGlobalScope<AppNestedScopeInf['app']>('app');
 
   useEffect(() => {
     console.log('App state is updated', appState);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { useGlobalScope } from '../../../src/GlobalState/GlobalState';
 import { AppNestedScopeInf } from '../types';
 import Value from './Value';
 
@@ -7,7 +7,7 @@ import Value from './Value';
 const priceTypeList: string[] = ['perPerson', 'total'];
 
 const Settings: React.FC = () => {
-    const settingsState = useGlobalState<AppNestedScopeInf['app']['settings']>('settings');
+    const settingsState = useGlobalScope<AppNestedScopeInf['app']['settings']>('settings');
     const [ priceType, setPriceType ] = settingsState.priceType;
 
     return (

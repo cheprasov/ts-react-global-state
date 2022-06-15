@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createGlobalState } from '../../src/GlobalState/GlobalState';
+import { createGlobalScope } from '../../src/GlobalState/GlobalState';
 import App from './App';
 import type { ConfigScopeInf } from './types';
 
-const ConfigGlobalState = createGlobalState('config',  {
+const ConfigGlobalState = createGlobalScope('config',  {
   env: 'prod',
   lang: 'English',
 } as ConfigScopeInf);

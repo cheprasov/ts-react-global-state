@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-    contextByName,
-    createGlobalState,
-    createMultiGlobalStates,
+    contextByScopeName,
+    createGlobalScope,
+    createMultiGlobalScopes,
     createStateDefiner,
-    useGlobalState,
-    withGlobalState,
+    useGlobalScope,
+    withGlobalScope,
 } from './GlobalState'
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -91,7 +91,7 @@ return n;
 
     });
 
-    describe('createGlobalState', () => {
+    describe('createGlobalScope', () => {
         const appScope = {
             foo: 'bar',
         };
@@ -101,27 +101,27 @@ return n;
             age: 37,
         }
         afterEach(() => {
-            contextByName.clear();
+            contextByScopeName.clear();
         });
 
         it('should create React.Function component wrapped by React.memo', () => {
-            const GlobalState = createGlobalState('user', { name: 'Alex', age: 37, city: 'London' });
+            const GlobalState = createGlobalScope('user', { name: 'Alex', age: 37, city: 'London' });
             expect(GlobalState['$$typeof']).toEqual(Symbol.for('react.memo'));
         });
 
         it('should throw an Error if scope created already', () => {
-            createGlobalState('user', { name: 'Alex', age: 37, city: 'London' });
+            createGlobalScope('user', { name: 'Alex', age: 37, city: 'London' });
             expect(() => {
-                createGlobalState('user', { foo: 'bar' });
+                createGlobalScope('user', { foo: 'bar' });
             }).toThrowError("GlobalState scope 'user' already exists");
         });
 
         it('should attach nested scope', () => {
-            const UserGlobalState = createGlobalState('user', userScope);
-            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+            const UserGlobalState = createGlobalScope('user', userScope);
+            const AppGlobalState = createGlobalScope('app', appScope, { user: 'user' });
 
             const Component: React.FC<{}> = () => {
-                const app = useGlobalState('app');
+                const app = useGlobalScope('app');
                 return (<div className="output">{JSON.stringify(app)}</div>);
             };
 
@@ -142,11 +142,11 @@ return n;
         });
 
         it('should use default values if nested GlobalScope is not rendered', () => {
-            const UserGlobalState = createGlobalState('user', userScope);
-            const AppGlobalState = createGlobalState('app', appScope, { user: 'user' });
+            const UserGlobalState = createGlobalScope('user', userScope);
+            const AppGlobalState = createGlobalScope('app', appScope, { user: 'user' });
 
             const Component: React.FC<{}> = () => {
-                const app = useGlobalState('app');
+                const app = useGlobalScope('app');
                 return (<div className="output">{JSON.stringify(app)}</div>);
             };
 
@@ -167,7 +167,7 @@ return n;
         });
     });
 
-    describe('useGlobalState', () => {
+    describe('useGlobalScope', () => {
         const userScope = {
             name: 'Alex',
             city: 'London',
@@ -176,15 +176,15 @@ return n;
         let UserGlobalState: any;
 
         beforeAll(() => {
-            UserGlobalState = createGlobalState('user', userScope);
+            UserGlobalState = createGlobalScope('user', userScope);
         });
 
         afterAll(() => {
-            contextByName.clear();
+            contextByScopeName.clear();
         });
 
         const User: React.FC = () => {
-            const globalState = useGlobalState<typeof userScope>('user');
+            const globalState = useGlobalScope<typeof userScope>('user');
             const [ name ] = globalState.name;
             const [ city ] = globalState.city;
             const [ age, setAge ] = globalState.age;
@@ -260,7 +260,7 @@ return n;
         });
     });
 
-    describe('withGlobalState', () => {
+    describe('withGlobalScope', () => {
         const userScope: UserScopeInf = {
             name: 'Alex',
             city: 'London',
@@ -273,11 +273,11 @@ return n;
         let UserGlobalState: any;
 
         beforeAll(() => {
-            UserGlobalState = createGlobalState('user', { ...userScope });
+            UserGlobalState = createGlobalScope('user', { ...userScope });
         });
 
         afterAll(() => {
-            contextByName.clear();
+            contextByScopeName.clear();
         });
 
         class TestClass extends React.Component<React.PropsWithChildren<{ userScope?: GlobalStateType<UserScopeInf> }>> {
@@ -315,7 +315,7 @@ return n;
         }
 
         const Updater: React.FC<{newName: string}> = ({ newName }) => {
-            const globalState = useGlobalState<typeof userScope>('user');
+            const globalState = useGlobalScope<typeof userScope>('user');
             const [ , setName ] = globalState.name;
 
             const updateName = () => {
@@ -330,15 +330,15 @@ return n;
         }
 
         it('should return function', () => {
-            expect(typeof withGlobalState(TestClass, { user: 'userScope' })).toEqual('function');
+            expect(typeof withGlobalScope(TestClass, { user: 'userScope' })).toEqual('function');
         });
 
         it('should return a new function each time', () => {
-            expect(withGlobalState(TestClass, { user: 'userScope' }))
-                .not.toBe(withGlobalState(TestClass, { user: 'userScope' }));
+            expect(withGlobalScope(TestClass, { user: 'userScope' }))
+                .not.toBe(withGlobalScope(TestClass, { user: 'userScope' }));
         });
 
-        it('should not use Global State if withGlobalState is not used for Class Component', () => {
+        it('should not use Global State if withGlobalScope is not used for Class Component', () => {
             const { container } = render(
                 <UserGlobalState>
                     <TestClass />
@@ -349,8 +349,8 @@ return n;
             expect(userElement?.textContent).toEqual('No Scope');
         });
 
-        it('should use Global State if withGlobalState is used for Class Component', () => {
-            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+        it('should use Global State if withGlobalScope is used for Class Component', () => {
+            const TestClassWithGlobalState = withGlobalScope(TestClass, { user: 'userScope' })
             const { container } = render(
                 <UserGlobalState>
                     <TestClassWithGlobalState />
@@ -362,7 +362,7 @@ return n;
         });
 
         it('should with children well if Class Component uses Global State', () => {
-            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' })
+            const TestClassWithGlobalState = withGlobalScope(TestClass, { user: 'userScope' })
             const { container } = render(
                 <UserGlobalState>
                     <TestClassWithGlobalState>
@@ -376,7 +376,7 @@ return n;
         });
 
         it('should render new value if Global State scope is updated', async () => {
-            const TestClassWithGlobalState = withGlobalState(TestClass, { user: 'userScope' });
+            const TestClassWithGlobalState = withGlobalScope(TestClass, { user: 'userScope' });
             const newName = `Super ${useState.name}`;
             const { container } = render(
                 <UserGlobalState>
@@ -395,8 +395,8 @@ return n;
         });
 
         it('should allow to use several Global States at Class Components', () => {
-            const ConfigGlobalState = createGlobalState('config', configScope);
-            const TestClassWithGlobalState = withGlobalState(TestClass2, { user: 'userScope', config: 'configScope' });
+            const ConfigGlobalState = createGlobalScope('config', configScope);
+            const TestClassWithGlobalState = withGlobalScope(TestClass2, { user: 'userScope', config: 'configScope' });
             const { container } = render(
                 <ConfigGlobalState>
                     <UserGlobalState>
@@ -409,37 +409,37 @@ return n;
         });
     });
 
-    describe('createMultiGlobalStates', () => {
+    describe('createMultiGlobalScopes', () => {
         beforeEach(() => {
-            contextByName.clear();
+            contextByScopeName.clear();
         });
 
         it('should create several global states', () => {
-            const GlobalStates = createMultiGlobalStates({
+            const GlobalStates = createMultiGlobalScopes({
                 foo: Scope({ value: 42 }),
                 bar: Scope({ value: 10 }),
                 baz: Scope({ value: 33 }),
             });
 
-            expect(contextByName.has('foo')).toEqual(true);
-            expect(contextByName.has('bar')).toEqual(true);
-            expect(contextByName.has('baz')).toEqual(true);
+            expect(contextByScopeName.has('foo')).toEqual(true);
+            expect(contextByScopeName.has('bar')).toEqual(true);
+            expect(contextByScopeName.has('baz')).toEqual(true);
         });
 
         it('should create global states only for scoped objects', () => {
-            const GlobalStates = createMultiGlobalStates({
+            const GlobalStates = createMultiGlobalScopes({
                 foo: { value: 42 },
                 bar: { value: 10 },
                 baz: Scope({ value: 33 }),
             });
 
-            expect(contextByName.has('foo')).toEqual(false);
-            expect(contextByName.has('bar')).toEqual(false);
-            expect(contextByName.has('baz')).toEqual(true);
+            expect(contextByScopeName.has('foo')).toEqual(false);
+            expect(contextByScopeName.has('bar')).toEqual(false);
+            expect(contextByScopeName.has('baz')).toEqual(true);
         });
 
         it('should create nested scope', () => {
-            const GlobalStates = createMultiGlobalStates({
+            const GlobalStates = createMultiGlobalScopes({
                 foo: Scope({
                     value: 42,
                     bar: Scope({
@@ -452,7 +452,7 @@ return n;
             });
 
             const Component: React.FC<{}> = () => {
-                const foo = useGlobalState('foo');
+                const foo = useGlobalScope('foo');
                 return (<div className="output">{JSON.stringify(foo)}</div>);
             };
 
@@ -485,12 +485,12 @@ return n;
                     }),
                 }),
             };
-            const GlobalStates = createMultiGlobalStates(initState);
+            const GlobalStates = createMultiGlobalScopes(initState);
 
             const testFunction = jest.fn();
 
             const Component: React.FC<{}> = () => {
-                const foo = useGlobalState('foo');
+                const foo = useGlobalScope('foo');
                 useEffect(() => {
                     testFunction(JSON.parse(JSON.stringify(foo)));
                 }, [foo]);
@@ -498,7 +498,7 @@ return n;
             };
 
             const Component2: React.FC<{}> = () => {
-                const { value: [ value, setValue ] } = useGlobalState<typeof initState.foo.bar.baz>('baz');
+                const { value: [ value, setValue ] } = useGlobalScope<typeof initState.foo.bar.baz>('baz');
                 const onClick = () => {
                     setValue(v => v + 1);
                 };

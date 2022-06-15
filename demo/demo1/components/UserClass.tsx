@@ -1,31 +1,31 @@
 import React from 'react';
-import { GlobalStateType, withGlobalState } from '../../../src/GlobalState/GlobalState';
+import { GlobalScopeType, withGlobalScope } from '../../../src/GlobalState/GlobalState';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 
 interface UserProps {
     role: string;
-    userGlobalState?: GlobalStateType<UserScopeInf>;
-    configGlobalState?: GlobalStateType<ConfigScopeInf>;
+    userGlobalScope?: GlobalScopeType<UserScopeInf>;
+    configGlobalScope?: GlobalScopeType<ConfigScopeInf>;
 }
 
 export default class UserClass extends React.Component<React.PropsWithChildren<UserProps>> {
 
     decrementAge = () => {
-        if (this.props.userGlobalState) {
-            const [ , setAge ] = this.props.userGlobalState.age;
+        if (this.props.userGlobalScope) {
+            const [ , setAge ] = this.props.userGlobalScope.age;
             setAge((value: number) => value - 1);
         }
     }
 
     increaseAge = () => {
-        if (this.props.userGlobalState) {
-            const [ , setAge ] = this.props.userGlobalState.age;
+        if (this.props.userGlobalScope) {
+            const [ , setAge ] = this.props.userGlobalScope.age;
             setAge((value: number) => value + 1);
         }
     }
 
     render() {
-        if (!this.props.userGlobalState) {
+        if (!this.props.userGlobalScope) {
             return (
                 <div>
                     User Scope is not provided
@@ -33,11 +33,11 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
             );
         }
 
-        const [ name ] = this.props.userGlobalState.name; // like useState
-        const [ city ] = this.props.userGlobalState.city; // like useState
-        const [ age ] = this.props.userGlobalState.age; // like useState
+        const [ name ] = this.props.userGlobalScope.name; // like useState
+        const [ city ] = this.props.userGlobalScope.city; // like useState
+        const [ age ] = this.props.userGlobalScope.age; // like useState
 
-        const [ env = 'Undefined' ]  = this.props.configGlobalState?.env || [];
+        const [ env = 'Undefined' ]  = this.props.configGlobalScope?.env || [];
 
         return (
             <div>
@@ -52,4 +52,4 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
     }
 }
 
-export const UserClassWithGlobalState = withGlobalState(UserClass, {user: 'userGlobalState', config: 'configGlobalState' });
+export const UserClassWithGlobalScope = withGlobalScope(UserClass, {user: 'userGlobalScope', config: 'configGlobalScope' });

@@ -5,14 +5,14 @@
 
 ### Added
 
-- Added function `createMultiGlobalStates` for creating multi and/or nested scopes.
-- Added otional param `useScope` for `createGlobalState` that allows to have references through scopes.
+- Added function `createMultiGlobalScopes` for creating multi and/or nested scopes.
+- Added otional param `useScope` for `createGlobalScope` that allows to have references through scopes.
 
 ## [1.1.0] - 2022-05-12
 
 ### Added
 
-- Added function `withGlobalState`. It allows to use Global State at Class Components.
+- Added function `withGlobalScope`. It allows to use Global State at Class Components.
 
 ## [1.0.0] - 2022-05-03
 

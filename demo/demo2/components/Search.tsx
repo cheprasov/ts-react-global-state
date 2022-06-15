@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { useGlobalScope } from '../../../src/GlobalState/GlobalState';
 import { AppNestedScopeInf } from '../types';
 import Value from './Value';
 
@@ -15,7 +15,7 @@ const destinationList: string[] = [
 const nightsList: string[] = Array(7).fill(0).map((v, i) => (i+1).toString());
 
 const Search: React.FC = () => {
-    const settingsState = useGlobalState<AppNestedScopeInf['app']['search']>('search');
+    const settingsState = useGlobalScope<AppNestedScopeInf['app']['search']>('search');
     const [ departure, setDeparture ] = settingsState.departure;
     const [ destination, setDestination ] = settingsState.destination;
     const [ nights, setNights ] = settingsState.nights;

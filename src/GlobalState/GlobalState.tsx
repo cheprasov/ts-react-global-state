@@ -3,11 +3,12 @@ import { stringify } from '../string/stringify';
 import { Tree } from '@cheprasov/data-structures';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
 import { isScope, ScopeInf } from './Scope';
+import { isFunction } from '../variables/isFunction';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
 export type StateTupleType<T> = [T, SetStateType<T> | undefined];
-export type GlobalStateType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
+export type GlobalScopeType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
 
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
@@ -28,14 +29,46 @@ export const createStateDefiner = (obj: Record<string, any>) => {
     );
 }
 
-export const contextByName = new Map<string, Context<any>>();
+export const contextByStateName = new Map<string, Context<any>>();
 
-export const createGlobalState = (
+export const createGlobalState = <S,>(name: string, initialState: S | (() => S)) => {
+    if (contextByStateName.has(name)) {
+        throw new Error(`GlobalState '${name}' already exists`)
+    }
+
+    const init = isFunction(initialState) ? initialState() : initialState;
+
+    const Context = React.createContext<StateTupleType<S>>([init, undefined]);
+    contextByStateName.set(name, Context);
+
+    const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+        const state = useState(initialState);
+        return (
+            <Context.Provider value={state}>
+                {children}
+            </Context.Provider>
+        );
+    };
+
+    return React.memo(ContextNode);
+};
+
+export const useGlobalState = <T,>(name: string): StateTupleType<T> => {
+    const Context = contextByStateName.get(name) as Context<StateTupleType<T>> | undefined;
+    if (!Context) {
+        throw new Error(`GlobalState '${name}' is not exist`);
+    }
+    return useContext(Context);
+};
+
+export const contextByScopeName = new Map<string, Context<any>>();
+
+export const createGlobalScope = (
     name: string,
     scope: Record<string, StateValueType<any>>,
     useScope: Record<string, string> = {},
 ) => {
-    if (contextByName.has(name)) {
+    if (contextByScopeName.has(name)) {
         throw new Error(`GlobalState scope '${name}' already exists`)
     }
 
@@ -53,14 +86,14 @@ export const createGlobalState = (
     });
 
     const Context = React.createContext(initScope);
-    contextByName.set(name, Context);
+    contextByScopeName.set(name, Context);
 
     const stateDefiner = createStateDefiner(scopeCopy);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const scopeValues: ScopeVariablesInf = stateDefiner(scopeCopy, useState);
         initUseScope.forEach(([key, scopeName]) => {
-            scopeValues[key] = useGlobalState(scopeName);
+            scopeValues[key] = useGlobalScope(scopeName);
         });
         return (
             <Context.Provider value={scopeValues}>
@@ -88,7 +121,7 @@ const isScopeNode = (node: ScopeNode | MultiScope): node is ScopeNode => {
     return node.$$_scopeType === 'scope';
 }
 
-export const createMultiGlobalStates = (scopes: MultiScope) => {
+export const createMultiGlobalScopes = (scopes: MultiScope) => {
     const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | ScopeNode, any[]>(
         scopes,
         (node) => {
@@ -129,7 +162,7 @@ export const createMultiGlobalStates = (scopes: MultiScope) => {
     );
 
     const globalScopes = linerScopes.reverse().map((scopeNode: ScopeNode) => {
-        return createGlobalState(scopeNode.name, scopeNode.scope, scopeNode.useScopes);
+        return createGlobalScope(scopeNode.name, scopeNode.scope, scopeNode.useScopes);
     });
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
@@ -143,23 +176,23 @@ export const createMultiGlobalStates = (scopes: MultiScope) => {
     return React.memo(ContextNode);
 };
 
-type ReturnUseGlobalState<T extends {}> = {
+type ReturnUseGlobalScope<T extends {}> = {
     [P in keyof Omit<T, '$$_scopeType'>]:
         T[P] extends ScopeInf
-            ? ReturnUseGlobalState<Omit<T[P], '$$_scopeType'>>
+            ? ReturnUseGlobalScope<Omit<T[P], '$$_scopeType'>>
             : [T[P], SetStateType<T[P]>]
 };
 
-export const useGlobalState = <T extends Record<string, any>>
-(name: string): ReturnUseGlobalState<T> => {
-    const Context = contextByName.get(name) as Context<T> | undefined;
+export const useGlobalScope = <T extends Record<string, any>>
+(name: string): ReturnUseGlobalScope<T> => {
+    const Context = contextByScopeName.get(name) as Context<T> | undefined;
     if (!Context) {
         throw new Error(`GlobalState scope '${name}' is not exist`)
     }
     return useContext(Context);
 };
 
-export const withGlobalState = <P extends object>
+export const withGlobalScope = <P extends object>
 (Component: React.ComponentType<P>, scopeToProp: Record<string, string>): React.FC<P> => {
     return new Function('u', 'c', 'C', 's', 'p', `
         var o = {};
@@ -172,5 +205,5 @@ export const withGlobalState = <P extends object>
         var n = Object.assign(o, p);
         delete n.children;
         return c(C, n, p.children);
-    `).bind(null, useGlobalState, createElement, Component, { ...scopeToProp });
+    `).bind(null, useGlobalScope, createElement, Component, { ...scopeToProp });
 }

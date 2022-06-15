@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
-import { useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { useGlobalScope, useGlobalState } from '../../../src/GlobalState/GlobalState';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 
 const User: React.FC = () => {
 
-    const userGlobalState = useGlobalState<UserScopeInf>('user');
+    const [foo, setFoo] = useGlobalState<number>('foo'); // Like useState
+
+    const userGlobalScope = useGlobalScope<UserScopeInf>('user');
     // globalState = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
@@ -18,12 +20,12 @@ const User: React.FC = () => {
     //    age: useState(37)
     // }
 
-    const [ name, setName ] = userGlobalState.name; // like useState
-    const [ city ] = userGlobalState.city; // like useState
-    const [ age, setAge ] = userGlobalState.age; // like useState
+    const [ name, setName ] = userGlobalScope.name; // like useState
+    const [ city ] = userGlobalScope.city; // like useState
+    const [ age, setAge ] = userGlobalScope.age; // like useState
 
 
-    const configGlobalState = useGlobalState<ConfigScopeInf>('config');
+    const configGlobalState = useGlobalScope<ConfigScopeInf>('config');
     const [ env ] = configGlobalState.env; // like useState
 
     const increaseAge = () => {
@@ -45,14 +47,15 @@ const User: React.FC = () => {
     useEffect(() => {
         // shows message if any of scope values is changed
         console.log('Some value of user scope is changed', name, city, age);
-    }, [userGlobalState]);
+    }, [userGlobalScope]);
 
     return (
         <div>
             Env: {env} <br />
             User Name: {name} <br />
             City: {city} <br />
-            Age: {age} <button onClick={decrementAge}>-</button> / <button onClick={increaseAge}>+</button>
+            Age: {age} <button onClick={decrementAge}>-</button> / <button onClick={increaseAge}>+</button> <br />
+            Foo: {foo} <br />
         </div>
     );
 }

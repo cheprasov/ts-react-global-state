@@ -20,7 +20,7 @@ The library allows to manage global state and nested global states easy. It is b
 ```
 
 ```javascript
-import { createGlobalState, useGlobalState } from '@cheprasov/react-global-state';
+import { createGlobalScope, useGlobalScope } from '@cheprasov/react-global-state';
 ```
 
 ### 2. Quick examples
@@ -28,7 +28,7 @@ import { createGlobalState, useGlobalState } from '@cheprasov/react-global-state
 #### 2.1. Create new Global State scope
 
 ```javascript
-import { createGlobalState } from '@cheprasov/react-global-state';
+import { createGlobalScope } from '@cheprasov/react-global-state';
 
 // The original object will not be changed
 const userScope = {
@@ -37,7 +37,7 @@ const userScope = {
     age: 37,
 };
 
-const GlobalState = createGlobalState('user', userScope); // return React.FunctionComponent
+const GlobalState = createGlobalScope('user', userScope); // return React.FunctionComponent
 
 // Then add once the GlobalState for render at any level you need
 
@@ -52,12 +52,12 @@ root.render(
 
 #### 2.2. Read / Update Global State at Functional Components
 ```javascript
-import { useGlobalState } from '@cheprasov/react-global-state';
+import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
 
-    // Use useGlobalState<UserScopeInterface>('user') for TypeScript
-    const globalState = useGlobalState('user');
+    // Use useGlobalScope<UserScopeInterface>('user') for TypeScript
+    const globalState = useGlobalScope('user');
     const [ name, setName ] = globalState.name; // like useState
     const [ age, setAge ] = globalState.age; // like useState
 
@@ -79,7 +79,7 @@ const User: React.FC = () => {
 #### 2.3. Read / Update Global State at Class Components
 ```javascript
 import React from 'react';
-import { withGlobalState } from '@cheprasov/react-global-state';
+import { withGlobalScope } from '@cheprasov/react-global-state';
 
 class UserClass extends React.Component {
 
@@ -113,7 +113,7 @@ class UserClass extends React.Component {
     }
 }
 
-const UserClassWithGlobalState = withGlobalState(UserClass, { user: 'userGlobalState' });
+const UserClassWithGlobalState = withGlobalScope(UserClass, { user: 'userGlobalState' });
 
 export { UserClassWithGlobalState as UserClass };
 
@@ -125,9 +125,9 @@ Please see more examples at [demo folder](/demo/).
 
 #### 3.1 Creating a Global State
 ```typescript
-createGlobalState(name: string, scope: Record<string, any>) // Returns React.memo(React.FunctionalComponent)
+createGlobalScope(name: string, scope: Record<string, any>) // Returns React.memo(React.FunctionalComponent)
 ```
-Please note, the `createGlobalState` should be called once and outside a component implementation.
+Please note, the `createGlobalScope` should be called once and outside a component implementation.
 
 **Params:**
  - name: `string` - Unique name for the scope.
@@ -138,7 +138,7 @@ Please note, the `createGlobalState` should be called once and outside a compone
 
 **Examples:**
 ```typescript
-const UserGlobalState = createGlobalState('user', { name: 'Alex' });
+const UserGlobalState = createGlobalScope('user', { name: 'Alex' });
 //...
 root.render(
     <GlobalState>
@@ -149,9 +149,9 @@ root.render(
 or
 ```typescript
 
-import { useGlobalState } from '@cheprasov/react-global-state';
+import { useGlobalScope } from '@cheprasov/react-global-state';
 
-const UserGlobalState = createGlobalState('user', { name: 'Alex' });
+const UserGlobalState = createGlobalScope('user', { name: 'Alex' });
 
 const App: React.FC = () => {
     // ...
@@ -170,9 +170,9 @@ const App: React.FC = () => {
 
 #### 3.2 Reading / Updating Global State
 ```typescript
-useGlobalState(name: string) // Returns { [key: string]: [value, setValue function] }
+useGlobalScope(name: string) // Returns { [key: string]: [value, setValue function] }
 ```
-The hook function `useGlobalState(name)` should be used inside Functional Component for getting a scope object with value and set function of Global State.
+The hook function `useGlobalScope(name)` should be used inside Functional Component for getting a scope object with value and set function of Global State.
 
 **Params:**
  - name: `string` - Name of scope.
@@ -188,7 +188,7 @@ const userScope = {
     city: 'London',
     age: 37,
 }
-const UserGlobalState = createGlobalState('user', userScope);
+const UserGlobalState = createGlobalScope('user', userScope);
 //...
 root.render(
     <GlobalState>
@@ -198,11 +198,11 @@ root.render(
 ```
 and then
 ```javascript
-import { useGlobalState } from '@cheprasov/react-global-state';
+import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
 
-    const globalState = useGlobalState('user');
+    const globalState = useGlobalScope('user');
     // globalState = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
@@ -288,7 +288,7 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
 
 ```javascript
 const WrappedUserClass = ({ children = undefined }) => {
-    const userState = useGlobalState('user');
+    const userState = useGlobalScope('user');
 
     // you can use as many Global States as you need.
 
@@ -302,10 +302,10 @@ const WrappedUserClass = ({ children = undefined }) => {
 };
 ```
 
-Or use HOC function `withGlobalState` that wraps your Class Component automatically for useing Global State.
+Or use HOC function `withGlobalScope` that wraps your Class Component automatically for useing Global State.
 
 ```typescript
-withGlobalState(Component: React.Component, scopeToProp: Record<string, string> ) // Returns Higher-Order Component
+withGlobalScope(Component: React.Component, scopeToProp: Record<string, string> ) // Returns Higher-Order Component
 ```
 
 **Params:**
@@ -318,7 +318,7 @@ withGlobalState(Component: React.Component, scopeToProp: Record<string, string> 
 **Examples:**
 
 ```javascript
-export const UserClassWithGlobalState = withGlobalState(
+export const UserClassWithGlobalState = withGlobalScope(
     UserClass, // Original Class, please see above
     { user: 'userGlobalState' }, // <Global Scope Name for key>: <Class Property Name for value>
 );
@@ -326,9 +326,9 @@ export const UserClassWithGlobalState = withGlobalState(
 
 #### 3.4 Creating Nested Global Scopes
 ```typescript
-createMultiGlobalStates(scopes: Object) // Returns React.memo(React.FunctionalComponent)
+createMultiGlobalScopes(scopes: Object) // Returns React.memo(React.FunctionalComponent)
 ```
-Please note, the `createMultiGlobalStates` should be called once and outside a component implementation.
+Please note, the `createMultiGlobalScopes` should be called once and outside a component implementation.
 
 **Params:**
  - scopes: `Object` - An object that will be used for creating key/values for scopes. The original object will be never changed. Allowed to have nested scopes.
@@ -376,7 +376,7 @@ const nestedScope = {
   }),
 };
 
-const GlobalStates = createMultiGlobalStates(nestedScope);
+const GlobalStates = createMultiGlobalScopes(nestedScope);
 
 root.render(
     <GlobalStates>
@@ -387,16 +387,16 @@ root.render(
 Use:
 ```typescript
 
-import { useGlobalState } from '@cheprasov/react-global-state';
+import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const App: React.FC = () => {
 
-    const app = useGlobalState('app');
+    const app = useGlobalScope('app');
 
     const [ departure, setDeparture ] = app.search.departure; // like useState
 
     // if you need only nested scope like filters
-    const filters = useGlobalState;('filters')
+    const filters = useGlobalScope;('filters')
         const [ rating, setRating ] = filters.rating; // like useState
 
     useEffect(() => {

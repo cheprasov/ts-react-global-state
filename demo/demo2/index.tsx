@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createMultiGlobalStates } from '../../src/GlobalState/GlobalState';
+import { createMultiGlobalScopes } from '../../src/GlobalState/GlobalState';
 import { Scope } from '../../src/GlobalState/Scope';
 import App from './App';
 
@@ -37,7 +37,7 @@ const nestedScope = {
   }),
 };
 
-const AppNestedState = createMultiGlobalStates(nestedScope);
+const AppNestedState = createMultiGlobalScopes(nestedScope);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
