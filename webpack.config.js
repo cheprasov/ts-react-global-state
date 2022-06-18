@@ -40,8 +40,9 @@ const libConfig = {
 const demoConfig = {
     target: 'node',
     entry: {
-        'demo1': './demo/demo1/index.tsx',
-        'demo2': './demo/demo2/index.tsx',
+        'GlobalState': './demo/GlobalState/index.tsx',
+        'GlobalReducer': './demo/GlobalReducer/index.tsx',
+        'NestedGlobalScope': './demo/NestedGlobalScope/index.tsx',
     },
     output: {
         filename: '[name].js',

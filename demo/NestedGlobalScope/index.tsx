@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createMultiGlobalScopes } from '../../src/GlobalState/GlobalState';
 import { Scope } from '../../src/GlobalState/Scope';
+import { Reducer } from '../../src/GlobalState/Reducer';
 import App from './App';
 
 const nestedScope = {
@@ -9,6 +10,9 @@ const nestedScope = {
     settings: Scope({
       priceType: 'total' // total | perPerson
     }),
+    reducer: Reducer(
+      () => {}, {}, () => {}
+    ),
     user: Scope({
       name: 'Alex',
       city: 'London',

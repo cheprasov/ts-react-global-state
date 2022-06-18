@@ -1,14 +1,24 @@
-import React, { useContext, Context, useState, Dispatch, SetStateAction, createElement } from 'react';
+import React, {
+    useContext,
+    Context,
+    useState,
+    Dispatch,
+    SetStateAction,
+    createElement,
+    useReducer,
+} from 'react';
 import { stringify } from '../string/stringify';
 import { Tree } from '@cheprasov/data-structures';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
 import { isScope, ScopeInf } from './Scope';
 import { isFunction } from '../variables/isFunction';
+import { isReducer, ReducerInf } from './Reducer';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
 export type StateTupleType<T> = [T, SetStateType<T> | undefined];
-export type GlobalScopeType<T>= { [P in keyof T]: [T[P], SetStateType<T[P]>] }
+export type GlobalScopeType<T> = { [P in keyof T]: [T[P], SetStateType<T[P]>] };
+export type ReducerTupleType<T, D> =[T, React.Dispatch<D> | undefined];
 
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
@@ -56,7 +66,44 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
 export const useGlobalState = <T,>(name: string): StateTupleType<T> => {
     const Context = contextByStateName.get(name) as Context<StateTupleType<T>> | undefined;
     if (!Context) {
-        throw new Error(`GlobalState '${name}' is not exist`);
+        throw new Error(`Global State '${name}' is not exist`);
+    }
+    return useContext(Context);
+};
+
+export const contextByReducerName = new Map<string, Context<any>>();
+
+export const createGlobalReducer = (
+    name: string,
+    reducer: React.Reducer<any, any>,
+    initialState: any,
+    initializer?: (init: any) => any,
+) => {
+    if (contextByReducerName.has(name)) {
+        throw new Error(`Global Reducer '${name}' already exists`)
+    }
+
+    const init = isFunction(initializer) ? initializer(initialState) : initialState;
+
+    const Context = React.createContext<ReducerTupleType<any, any>>([init, undefined]);
+    contextByReducerName.set(name, Context);
+
+    const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+        const state = useReducer(reducer, initialState);
+        return (
+            <Context.Provider value={state}>
+                {children}
+            </Context.Provider>
+        );
+    };
+
+    return React.memo(ContextNode);
+};
+
+export const useGlobalReducer = <T,D>(name: string): ReducerTupleType<T, D> => {
+    const Context = contextByReducerName.get(name) as Context<ReducerTupleType<T, D>> | undefined;
+    if (!Context) {
+        throw new Error(`Global Reducer '${name}' is not exist`);
     }
     return useContext(Context);
 };
@@ -67,6 +114,7 @@ export const createGlobalScope = (
     name: string,
     scope: Record<string, StateValueType<any>>,
     useScope: Record<string, string> = {},
+    useReducer: Record<string, string> = {},
 ) => {
     if (contextByScopeName.has(name)) {
         throw new Error(`GlobalState scope '${name}' already exists`)
@@ -85,6 +133,15 @@ export const createGlobalScope = (
         delete initScope[key];
     });
 
+    const initUseReducer = Object.entries(useReducer);
+    initUseReducer.forEach(([key]) => {
+        delete scopeCopy[key];
+        delete initScope[key];
+    });
+
+    console.log('initUseScope', initUseScope);
+    console.log('initUseReducer', initUseReducer);
+
     const Context = React.createContext(initScope);
     contextByScopeName.set(name, Context);
 
@@ -94,6 +151,9 @@ export const createGlobalScope = (
         const scopeValues: ScopeVariablesInf = stateDefiner(scopeCopy, useState);
         initUseScope.forEach(([key, scopeName]) => {
             scopeValues[key] = useGlobalScope(scopeName);
+        });
+        initUseReducer.forEach(([key, scopeName]) => {
+            scopeValues[key] = useGlobalReducer(scopeName);
         });
         return (
             <Context.Provider value={scopeValues}>
@@ -109,51 +169,59 @@ interface MultiScope {
     [key: string]: any | MultiScope & ScopeInf;
 }
 
-interface ScopeNode {
-    $$_scopeType: string;
+interface Node {
+    $$__nodeType: 'scope' | 'reducer';
     name: string;
-    scope: MultiScope;
-    parent: ScopeNode | null;
+    data: ScopeInf | ReducerInf;
+    parent: Node | null;
     useScopes: Record<string, string>;
+    useReducer: Record<string, string>;
 }
 
-const isScopeNode = (node: ScopeNode | MultiScope): node is ScopeNode => {
-    return node.$$_scopeType === 'scope';
+const isNode = (node: any): node is Node => {
+    return node.$$__nodeType === 'scope' || node.$$__nodeType === 'reducer';
 }
 
 export const createMultiGlobalScopes = (scopes: MultiScope) => {
-    const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | ScopeNode, any[]>(
+    const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | Node, any[]>(
         scopes,
         (node) => {
-            const children: ScopeNode[] = [];
-            let scope;
-            if (isScopeNode(node)) {
-                scope = node.scope;
+            const children: Node[] = [];
+            let scopeOrReducer;
+            if (isNode(node)) {
+                scopeOrReducer = node.data;
             } else {
-                scope = node;
+                scopeOrReducer = node;
             }
-            for (const key in scope) {
-                if (!scope.hasOwnProperty(key)) {
+            for (const key in scopeOrReducer) {
+                if (!scopeOrReducer.hasOwnProperty(key)) {
                     continue;
                 }
-                if (!isScope(scope[key])) {
+                if (!isScope(scopeOrReducer[key]) && !isReducer(scopeOrReducer[key])) {
                     continue;
                 }
+                const type = scopeOrReducer[key].$$_scopeType;
                 children.push({
-                    $$_scopeType: 'scope',
+                    $$__nodeType: type,
                     name: key,
-                    scope: scope[key],
-                    parent: isScopeNode(node) ? node : null,
+                    data: scopeOrReducer[key],
+                    parent: isNode(node) ? node : null,
                     useScopes: {},
+                    useReducer: {},
                 });
-                if (isScopeNode(node)) {
-                    node.useScopes[key] = key;
+                if (isNode(node)) {
+                    if (type === 'scope') {
+                        node.useScopes[key] = key;
+                    }
+                    if (type === 'reducer') {
+                        node.useReducer[key] = key;
+                    }
                 }
             }
             return children;
         },
-        (result, node: MultiScope | ScopeNode) => {
-            if (isScopeNode(node)) {
+        (result, node: MultiScope | Node) => {
+            if (isNode(node)) {
                 result.push(node);
             }
             return result;
@@ -161,8 +229,15 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
         [],
     );
 
-    const globalScopes = linerScopes.reverse().map((scopeNode: ScopeNode) => {
-        return createGlobalScope(scopeNode.name, scopeNode.scope, scopeNode.useScopes);
+    const globalScopes = linerScopes.reverse().map((scopeNode: Node) => {
+        if (scopeNode.$$__nodeType === 'scope') {
+            return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer);
+        }
+        if (scopeNode.$$__nodeType === 'reducer') {
+            const { reducer, initialState, initializer } = scopeNode.data as ReducerInf;
+            return createGlobalReducer(scopeNode.name, reducer, initialState, initializer);
+        }
+        return ({ children }: any) => children;
     });
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {

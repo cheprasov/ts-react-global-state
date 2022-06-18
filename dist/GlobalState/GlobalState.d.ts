@@ -6,6 +6,7 @@ export declare type StateTupleType<T> = [T, SetStateType<T> | undefined];
 export declare type GlobalScopeType<T> = {
     [P in keyof T]: [T[P], SetStateType<T[P]>];
 };
+export declare type ReducerTupleType<T, D> = [T, React.Dispatch<D> | undefined];
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
 }
@@ -15,8 +16,13 @@ export declare const createGlobalState: <S>(name: string, initialState: S | (() 
     children?: React.ReactNode;
 }>;
 export declare const useGlobalState: <T>(name: string) => StateTupleType<T>;
+export declare const contextByReducerName: Map<string, React.Context<any>>;
+export declare const createGlobalReducer: (name: string, reducer: React.Reducer<any, any>, initialState: any, initializer?: ((init: any) => any) | undefined) => React.NamedExoticComponent<{
+    children?: React.ReactNode;
+}>;
+export declare const useGlobalReducer: <T, D>(name: string) => ReducerTupleType<T, D>;
 export declare const contextByScopeName: Map<string, React.Context<any>>;
-export declare const createGlobalScope: (name: string, scope: Record<string, StateValueType<any>>, useScope?: Record<string, string>) => React.NamedExoticComponent<{
+export declare const createGlobalScope: (name: string, scope: Record<string, StateValueType<any>>, useScope?: Record<string, string>, useReducer?: Record<string, string>) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
 interface MultiScope {
