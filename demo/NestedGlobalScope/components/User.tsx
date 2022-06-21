@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGlobalScope } from '../../../src/GlobalState/GlobalState';
 import { AppNestedScopeInf } from '../types';
 import Hobby from './Hobby';
 
 const User: React.FC = () => {
-    const userState = useGlobalScope<AppNestedScopeInf['app']['user']>('user');
-    const [ name, setName ] = userState.name; // like useState
-    const [ city ] = userState.city; // like useState
-    const [ age, setAge ] = userState.age; // like useState
+    const userScope = useGlobalScope<AppNestedScopeInf['app']['user']>('user');
+
+    const [ name, setName ] = userScope.name; // like useState
+    const [ city ] = userScope.city; // like useState
+    const [ age, setAge ] = userScope.age; // like useState
 
     const updateName = () => {
         setName(Math.round(Math.random() * 100000).toString(36));
@@ -27,13 +28,13 @@ const User: React.FC = () => {
 
     useEffect(() => {
         console.log('Some value of user scope is changed', name, city, age);
-    }, [userState]);
+    }, [userScope]);
 
     const hobbies = useMemo(() => {
-        return Object.entries(userState.hobby).map(([key, [value, setValue]]) => {
+        return Object.entries(userScope.hobby).map(([key, [value, setValue]]) => {
             return <Hobby key={key} name={key} value={value} onChange={setValue} />
         });
-    }, [userState.hobby])
+    }, [userScope.hobby])
 
     return (
         <div>

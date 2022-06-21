@@ -1,28 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createMultiGlobalScopes } from '../../src/GlobalState/GlobalState';
-import { Scope } from '../../src/GlobalState/Scope';
-import { Reducer } from '../../src/GlobalState/Reducer';
+import { GlobalScope } from '../../src/GlobalState/Scope';
+import { GlobalReducer } from '../../src/GlobalState/Reducer';
 import App from './App';
 
 const nestedScope = {
-  app: Scope({
-    settings: Scope({
+  app: new GlobalScope({
+    settings: new GlobalScope({
       priceType: 'total' // total | perPerson
     }),
-    reducer: Reducer(
+    reducer: new GlobalReducer(
       () => {}, {}, () => {}
     ),
-    user: Scope({
+    user: new GlobalScope({
       name: 'Alex',
       city: 'London',
       age: 37,
-      hobby: Scope({
+      hobby: new GlobalScope({
         chess: 'beginner',
         it: 'expert',
       }),
     }),
-    search: Scope({
+    search: new GlobalScope({
       departure: 'London',
       destination: 'Paris',
       date: Date.now(),
@@ -30,7 +30,7 @@ const nestedScope = {
         { adult: 2 },
       ],
       nights: 7,
-      filters: Scope({
+      filters: new GlobalScope({
         rating: 5,
         price: {
           min: 0,

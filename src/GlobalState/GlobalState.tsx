@@ -10,9 +10,9 @@ import React, {
 import { stringify } from '../string/stringify';
 import { Tree } from '@cheprasov/data-structures';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
-import { isScope, ScopeInf } from './Scope';
+import { GlobalScope, isGlobalScope, Scope } from './Scope';
 import { isFunction } from '../variables/isFunction';
-import { isReducer, ReducerInf } from './Reducer';
+import { GlobalReducer, isGlobalReducer } from './Reducer';
 
 export type StateValueType<T> = T | (() => T);
 export type SetStateType<T> = Dispatch<SetStateAction<T>>
@@ -139,9 +139,6 @@ export const createGlobalScope = (
         delete initScope[key];
     });
 
-    console.log('initUseScope', initUseScope);
-    console.log('initUseReducer', initUseReducer);
-
     const Context = React.createContext(initScope);
     contextByScopeName.set(name, Context);
 
@@ -156,7 +153,7 @@ export const createGlobalScope = (
             scopeValues[key] = useGlobalReducer(scopeName);
         });
         return (
-            <Context.Provider value={scopeValues}>
+            <Context.Provider value={new Scope(scopeValues)}>
                 {children}
             </Context.Provider>
         );
@@ -166,13 +163,13 @@ export const createGlobalScope = (
 };
 
 interface MultiScope {
-    [key: string]: any | MultiScope & ScopeInf;
+    [key: string]: any | MultiScope & typeof GlobalScope;
 }
 
 interface Node {
     $$__nodeType: 'scope' | 'reducer';
     name: string;
-    data: ScopeInf | ReducerInf;
+    data: GlobalScope | GlobalReducer;
     parent: Node | null;
     useScopes: Record<string, string>;
     useReducer: Record<string, string>;
@@ -188,7 +185,8 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
         (node) => {
             const children: Node[] = [];
             let scopeOrReducer;
-            if (isNode(node)) {
+            const isItNode = isNode(node);
+            if (isItNode) {
                 scopeOrReducer = node.data;
             } else {
                 scopeOrReducer = node;
@@ -197,23 +195,29 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
                 if (!scopeOrReducer.hasOwnProperty(key)) {
                     continue;
                 }
-                if (!isScope(scopeOrReducer[key]) && !isReducer(scopeOrReducer[key])) {
-                    continue;
-                }
-                const type = scopeOrReducer[key].$$_scopeType;
-                children.push({
-                    $$__nodeType: type,
-                    name: key,
-                    data: scopeOrReducer[key],
-                    parent: isNode(node) ? node : null,
-                    useScopes: {},
-                    useReducer: {},
-                });
-                if (isNode(node)) {
-                    if (type === 'scope') {
+                if (isGlobalScope(scopeOrReducer[key])) {
+                    children.push({
+                        $$__nodeType: 'scope',
+                        name: key,
+                        data: scopeOrReducer[key],
+                        parent: isItNode ? node : null,
+                        useScopes: {},
+                        useReducer: {},
+                    });
+                    if (isItNode) {
                         node.useScopes[key] = key;
                     }
-                    if (type === 'reducer') {
+                }
+                if (isGlobalReducer(scopeOrReducer[key])) {
+                    children.push({
+                        $$__nodeType: 'reducer',
+                        name: key,
+                        data: scopeOrReducer[key],
+                        parent: isItNode ? node : null,
+                        useScopes: {},
+                        useReducer: {},
+                    });
+                    if (isItNode) {
                         node.useReducer[key] = key;
                     }
                 }
@@ -233,9 +237,9 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
         if (scopeNode.$$__nodeType === 'scope') {
             return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer);
         }
-        if (scopeNode.$$__nodeType === 'reducer') {
-            const { reducer, initialState, initializer } = scopeNode.data as ReducerInf;
-            return createGlobalReducer(scopeNode.name, reducer, initialState, initializer);
+        if (scopeNode.$$__nodeType === 'reducer' && isGlobalReducer(scopeNode.data)) {
+            const gr = scopeNode.data as GlobalReducer;
+            return createGlobalReducer(scopeNode.name, gr.reducer, gr.initialState, gr.initializer);
         }
         return ({ children }: any) => children;
     });
@@ -251,16 +255,24 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
     return React.memo(ContextNode);
 };
 
-type ReturnUseGlobalScope<T extends {}> = {
-    [P in keyof Omit<T, '$$_scopeType'>]:
-        T[P] extends ScopeInf
-            ? ReturnUseGlobalScope<Omit<T[P], '$$_scopeType'>>
+
+// type ReturnUseGlobalScope<T extends {}> = {
+//     [P in keyof T]:
+//         T[P] extends Scope<any>
+//             ? ReturnUseGlobalScope<T[P]>
+//             : [T[P], SetStateType<T[P]>]
+// };
+
+type ReturnUseGlobalScope<T> = {
+    [P in keyof T]:
+        T[P] extends GlobalScope
+            ? ReturnUseGlobalScope<T[P]> & Scope
             : [T[P], SetStateType<T[P]>]
 };
 
 export const useGlobalScope = <T extends Record<string, any>>
-(name: string): ReturnUseGlobalScope<T> => {
-    const Context = contextByScopeName.get(name) as Context<T> | undefined;
+(name: string): ReturnUseGlobalScope<T> & Scope => {
+    const Context = contextByScopeName.get(name) as Context<T & Scope> | undefined;
     if (!Context) {
         throw new Error(`GlobalState scope '${name}' is not exist`)
     }

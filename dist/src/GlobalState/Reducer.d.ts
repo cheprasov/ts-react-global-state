@@ -1,9 +1,8 @@
-/// <reference types="react" />
-export interface ReducerInf {
-    $$_scopeType: 'reducer';
-    reducer: React.Reducer<any, any>;
-    initialState: any;
-    initializer?: (init: any) => any;
+import React from 'react';
+export declare class GlobalReducer {
+    readonly reducer: React.Reducer<any, any>;
+    readonly initialState: any;
+    readonly initializer?: (init: any) => any;
+    constructor(reducer: React.Reducer<any, any>, initialState: any, initializer?: (init: any) => any);
 }
-export declare const isReducer: (value: any) => value is ReducerInf;
-export declare const Reducer: (reducer: React.Reducer<any, any>, initialState: any, initializer?: ((init: any) => any) | undefined) => ReducerInf;
+export declare const isGlobalReducer: (value: any) => value is GlobalReducer;

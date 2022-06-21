@@ -1,19 +1,19 @@
-import { ScopeInf } from '../../src/GlobalState/Scope';
+import { GlobalScope } from '../../src/GlobalState/Scope';
 export interface AppNestedScopeInf {
-    app: ScopeInf & {
-        settings: ScopeInf & {
+    app: GlobalScope & {
+        settings: GlobalScope & {
             priceType: string;
         };
-        user: ScopeInf & {
+        user: GlobalScope & {
             name: string;
             city: string;
             age: number;
-            hobby: ScopeInf & {
+            hobby: GlobalScope & {
                 chess: string;
                 it: string;
             };
         };
-        search: ScopeInf & {
+        search: GlobalScope & {
             departure: string;
             destination: string;
             date: number;
@@ -22,7 +22,7 @@ export interface AppNestedScopeInf {
                 children?: number;
             }[];
             nights: number;
-            filters: ScopeInf & {
+            filters: GlobalScope & {
                 rating: number;
                 price: {
                     min: number;

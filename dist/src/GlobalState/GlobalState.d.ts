@@ -1,5 +1,5 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
-import { ScopeInf } from './Scope';
+import { GlobalScope, Scope } from './Scope';
 export declare type StateValueType<T> = T | (() => T);
 export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
 export declare type StateTupleType<T> = [T, SetStateType<T> | undefined];
@@ -26,14 +26,14 @@ export declare const createGlobalScope: (name: string, scope: Record<string, Sta
     children?: React.ReactNode;
 }>;
 interface MultiScope {
-    [key: string]: any | MultiScope & ScopeInf;
+    [key: string]: any | MultiScope & typeof GlobalScope;
 }
 export declare const createMultiGlobalScopes: (scopes: MultiScope) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
-declare type ReturnUseGlobalScope<T extends {}> = {
-    [P in keyof Omit<T, '$$_scopeType'>]: T[P] extends ScopeInf ? ReturnUseGlobalScope<Omit<T[P], '$$_scopeType'>> : [T[P], SetStateType<T[P]>];
+declare type ReturnUseGlobalScope<T> = {
+    [P in keyof T]: T[P] extends GlobalScope ? ReturnUseGlobalScope<T[P]> & Scope : [T[P], SetStateType<T[P]>];
 };
-export declare const useGlobalScope: <T extends Record<string, any>>(name: string) => ReturnUseGlobalScope<T>;
+export declare const useGlobalScope: <T extends Record<string, any>>(name: string) => ReturnUseGlobalScope<T> & Scope<{}, never>;
 export declare const withGlobalScope: <P extends object>(Component: React.ComponentType<P>, scopeToProp: Record<string, string>) => React.FC<P>;
 export {};

@@ -1,26 +1,26 @@
-import { ScopeInf } from '../../src/GlobalState/Scope';
+import { GlobalScope } from '../../src/GlobalState/Scope';
 
 export interface AppNestedScopeInf {
-    app: ScopeInf & {
-      settings: ScopeInf & {
+    app: GlobalScope & {
+      settings: GlobalScope & {
         priceType: string; // total | perPerson
       };
-      user: ScopeInf & {
+      user: GlobalScope & {
         name: string;
         city: string;
         age: number;
-        hobby: ScopeInf & {
+        hobby: GlobalScope & {
           chess: string;
           it: string;
         },
       };
-      search: ScopeInf & {
+      search: GlobalScope & {
         departure: string;
         destination: string;
         date: number;
         rooms: {adult: number, children?: number}[];
         nights: number,
-        filters: ScopeInf & {
+        filters: GlobalScope & {
           rating: number,
           price: {
             min: number,

@@ -1,5 +1,10 @@
-export interface ScopeInf {
-    $$_scopeType: 'scope';
+export declare class GlobalScope {
+    readonly scope: Record<string, any>;
+    constructor(scope: Record<string, any>);
 }
-export declare const isScope: (value: any) => value is ScopeInf;
-export declare const Scope: <T extends Record<string, any>>(scope: T) => T & ScopeInf;
+export declare const isGlobalScope: (value: any) => value is GlobalScope;
+export declare class Scope<T extends Record<string, any> = {}, P = keyof T> {
+    [P: string]: any;
+    constructor(scope: T);
+    toObject(): Record<string, any>;
+}

@@ -6,15 +6,17 @@ import User from './components/User';
 import { AppNestedScopeInf } from './types';
 
 function App() {
-  const appState = useGlobalScope<AppNestedScopeInf['app']>('app');
+  const appScope = useGlobalScope<AppNestedScopeInf['app']>('app');
+  appScope.settings.toObject()
 
   useEffect(() => {
-    console.log('App state is updated', appState);
-  }, [appState])
+    //@ts-ignore
+    console.log('App state is updated', appScope, appScope.toObject(), JSON.stringify(appScope.toObject()));
+  }, [appScope])
 
   useEffect(() => {
-    console.log('User Name is updated', appState.user.name[0]);
-  }, [appState.user.name[0]])
+    console.log('User Name is updated', appScope.user.name[0]);
+  }, [appScope.user.name[0]])
 
   return (
     <div className="App">
