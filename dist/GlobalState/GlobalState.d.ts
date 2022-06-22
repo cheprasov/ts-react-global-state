@@ -1,12 +1,6 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 import { GlobalScope, Scope } from './Scope';
-export declare type StateValueType<T> = T | (() => T);
-export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
-export declare type StateTupleType<T> = [T, SetStateType<T> | undefined];
-export declare type GlobalScopeType<T> = {
-    [P in keyof T]: [T[P], SetStateType<T[P]>];
-};
-export declare type ReducerTupleType<T, D> = [T, React.Dispatch<D> | undefined];
+import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
 }

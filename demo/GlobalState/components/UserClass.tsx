@@ -1,5 +1,6 @@
 import React from 'react';
-import { GlobalScopeType, withGlobalScope } from '../../../src/GlobalState/GlobalState';
+import { withGlobalScope } from '../../../src/GlobalState/GlobalState';
+import { GlobalScopeType } from '../../../src/GlobalState/types';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 
 interface UserProps {
