@@ -6,20 +6,6 @@ export class GlobalScope {
     }
 }
 
-// export function GlobalScope<T extends Record<string, any> = {}>(this: any, scope: T): T {
-//     if (this instanceof GlobalScope) {
-//         for (let key in scope) {
-//             if (!scope.hasOwnProperty(key)) {
-//                 continue;
-//             }
-//             (this as any)[key] = scope[key];
-//         }
-//         return this as T;
-//     } else {
-//         return new (GlobalScope as any)(scope);
-//     }
-// }
-
 export const isGlobalScope = (value: any): value is GlobalScope => {
     return value instanceof GlobalScope;
 }

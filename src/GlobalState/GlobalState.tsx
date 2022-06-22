@@ -2,8 +2,6 @@ import React, {
     useContext,
     Context,
     useState,
-    Dispatch,
-    SetStateAction,
     createElement,
     useReducer,
 } from 'react';
@@ -14,11 +12,7 @@ import { GlobalScope, isGlobalScope, Scope } from './Scope';
 import { isFunction } from '../variables/isFunction';
 import { GlobalReducer, isGlobalReducer } from './Reducer';
 
-export type StateValueType<T> = T | (() => T);
-export type SetStateType<T> = Dispatch<SetStateAction<T>>
-export type StateTupleType<T> = [T, SetStateType<T> | undefined];
-export type GlobalScopeType<T> = { [P in keyof T]: [T[P], SetStateType<T[P]>] };
-export type ReducerTupleType<T, D> =[T, React.Dispatch<D> | undefined];
+import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
 
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
