@@ -1,21 +1,19 @@
-import { isGlobalScope, Scope } from './Scope';
+import { isGlobalScope, GlobalScope } from './Scope';
 
 describe('Scope', () => {
     it('should create a new scope object', () => {
         const obj = {
             foo: 'bar',
         };
-        const scope = Scope(obj);
+        const scope = new GlobalScope(obj);
         expect(isGlobalScope(scope)).toEqual(true);
         expect(scope).not.toBe(obj);
-        expect(scope.$$_scopeType).toEqual('scope');
     });
 });
 
 describe('isScope', () => {
     it('should return TRUE if object is a Scope', () => {
-        expect(isGlobalScope(Scope({ foo: 'bar' }))).toEqual(true);
-        expect(isGlobalScope({ foo: 'bar', $$_scopeType: 'scope' })).toEqual(true);
+        expect(isGlobalScope(new GlobalScope({ foo: 'bar' }))).toEqual(true);
     });
 
     it('should return FALSE if value is a Scope', () => {

@@ -12,9 +12,9 @@ import userEvent from '@testing-library/user-event';
 import { ConfigScopeInf, UserScopeInf } from '../../demo/GlobalState/types';
 import { GlobalStateType } from '../../dist';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
-import { Scope } from './Scope';
+import { GlobalScope, Scope } from './Scope';
 
-describe('GlobalState', () => {
+describe('GlobalScope', () => {
 
     describe('createStateDefiner', () => {
         it('should create a new function', () => {
@@ -113,7 +113,7 @@ return n;
             createGlobalScope('user', { name: 'Alex', age: 37, city: 'London' });
             expect(() => {
                 createGlobalScope('user', { foo: 'bar' });
-            }).toThrowError("GlobalState scope 'user' already exists");
+            }).toThrowError("Global Scope 'user' already exists");
         });
 
         it('should attach nested scope', () => {
@@ -416,9 +416,9 @@ return n;
 
         it('should create several global states', () => {
             const GlobalStates = createMultiGlobalScopes({
-                foo: Scope({ value: 42 }),
-                bar: Scope({ value: 10 }),
-                baz: Scope({ value: 33 }),
+                foo: new GlobalScope({ value: 42 }),
+                bar: new GlobalScope({ value: 10 }),
+                baz: new GlobalScope({ value: 33 }),
             });
 
             expect(contextByScopeName.has('foo')).toEqual(true);
@@ -430,7 +430,7 @@ return n;
             const GlobalStates = createMultiGlobalScopes({
                 foo: { value: 42 },
                 bar: { value: 10 },
-                baz: Scope({ value: 33 }),
+                baz: new GlobalScope({ value: 33 }),
             });
 
             expect(contextByScopeName.has('foo')).toEqual(false);
@@ -440,19 +440,22 @@ return n;
 
         it('should create nested scope', () => {
             const GlobalStates = createMultiGlobalScopes({
-                foo: Scope({
+                foo: new GlobalScope({
                     value: 42,
-                    bar: Scope({
+                    bar: new GlobalScope({
                         value: 10,
-                        baz: Scope({
+                        baz: new GlobalScope({
                             value: 33
                         }),
                     }),
                 }),
             });
 
+            const checkScope = jest.fn();
+
             const Component: React.FC<{}> = () => {
                 const foo = useGlobalScope('foo');
+                checkScope(foo);
                 return (<div className="output">{JSON.stringify(foo)}</div>);
             };
 
@@ -462,12 +465,17 @@ return n;
                 </GlobalStates>
             );
             const elem = wrapper.container.querySelector('.output');
-            expect(JSON.parse(elem?.textContent || '')).toEqual({
-                value: [42, null],
+            expect(checkScope).toBeCalledTimes(1);
+            const foo = checkScope.mock.calls[0][0];
+            expect(foo).toBeInstanceOf(Scope);
+            expect(foo.bar).toBeInstanceOf(Scope);
+            expect(foo.bar.baz).toBeInstanceOf(Scope);
+            expect(foo.toObject()).toEqual({
+                value: 42,
                 bar: {
-                    value: [10, null],
+                    value: 10,
                     baz: {
-                        value: [33, null],
+                        value: 33,
                     }
                 },
             });
@@ -475,11 +483,11 @@ return n;
 
         it('should update parent scope if child scope is updated', async () => {
             const initState = {
-                foo: Scope({
+                foo: new GlobalScope({
                     value: 42,
-                    bar: Scope({
+                    bar: new GlobalScope({
                         value: 10,
-                        baz: Scope({
+                        baz: new GlobalScope({
                             value: 33
                         }),
                     }),
@@ -498,9 +506,9 @@ return n;
             };
 
             const Component2: React.FC<{}> = () => {
-                const { value: [ value, setValue ] } = useGlobalScope<typeof initState.foo.bar.baz>('baz');
+                const { value: [ value, setValue ] } = useGlobalScope<any>('baz');
                 const onClick = () => {
-                    setValue(v => v + 1);
+                    setValue((v: number) => v + 1);
                 };
                 return (<button onClick={onClick} />);
             };

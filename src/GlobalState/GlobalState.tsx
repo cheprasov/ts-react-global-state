@@ -117,7 +117,7 @@ export const createGlobalScope = (
     useReducer: Record<string, string> = {},
 ) => {
     if (contextByScopeName.has(name)) {
-        throw new Error(`GlobalState scope '${name}' already exists`)
+        throw new Error(`Global Scope '${name}' already exists`)
     }
 
     const scopeCopy = { ...scope };
@@ -191,6 +191,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
             } else {
                 scopeOrReducer = node;
             }
+
             for (const key in scopeOrReducer) {
                 if (!scopeOrReducer.hasOwnProperty(key)) {
                     continue;
@@ -199,7 +200,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
                     children.push({
                         $$__nodeType: 'scope',
                         name: key,
-                        data: scopeOrReducer[key],
+                        data: scopeOrReducer[key].scope,
                         parent: isItNode ? node : null,
                         useScopes: {},
                         useReducer: {},
@@ -238,8 +239,8 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
             return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer);
         }
         if (scopeNode.$$__nodeType === 'reducer' && isGlobalReducer(scopeNode.data)) {
-            const gr = scopeNode.data as GlobalReducer;
-            return createGlobalReducer(scopeNode.name, gr.reducer, gr.initialState, gr.initializer);
+            const globalReducer = scopeNode.data as GlobalReducer;
+            return createGlobalReducer(scopeNode.name, globalReducer.reducer, globalReducer.initialState, globalReducer.initializer);
         }
         return ({ children }: any) => children;
     });

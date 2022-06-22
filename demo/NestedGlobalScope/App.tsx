@@ -7,6 +7,7 @@ import { AppNestedScopeInf } from './types';
 
 function App() {
   const appScope = useGlobalScope<AppNestedScopeInf['app']>('app');
+  console.log(appScope);
   appScope.settings.toObject()
 
   useEffect(() => {
