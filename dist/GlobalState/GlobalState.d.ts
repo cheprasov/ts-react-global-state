@@ -31,7 +31,7 @@ interface MultiScope {
 export declare const createMultiGlobalScopes: (scopes: MultiScope) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
-declare type ReturnUseGlobalScope<T> = {
+declare type ReturnUseGlobalScope<T extends {}> = {
     [P in keyof T]: T[P] extends GlobalScope ? ReturnUseGlobalScope<T[P]> & Scope : [T[P], SetStateType<T[P]>];
 };
 export declare const useGlobalScope: <T extends Record<string, any>>(name: string) => ReturnUseGlobalScope<T> & Scope<{}, never>;

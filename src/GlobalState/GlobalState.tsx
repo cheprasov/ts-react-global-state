@@ -43,7 +43,7 @@ export const contextByStateName = new Map<string, Context<any>>();
 
 export const createGlobalState = <S,>(name: string, initialState: S | (() => S)) => {
     if (contextByStateName.has(name)) {
-        throw new Error(`GlobalState '${name}' already exists`)
+        throw new Error(`Global State '${name}' already exists`)
     }
 
     const init = isFunction(initialState) ? initialState() : initialState;
@@ -169,7 +169,7 @@ interface MultiScope {
 interface Node {
     $$__nodeType: 'scope' | 'reducer';
     name: string;
-    data: GlobalScope | GlobalReducer;
+    data: Record<string, any> | GlobalReducer;
     parent: Node | null;
     useScopes: Record<string, string>;
     useReducer: Record<string, string>;
@@ -184,41 +184,46 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
         scopes,
         (node) => {
             const children: Node[] = [];
-            let scopeOrReducer;
-            const isItNode = isNode(node);
-            if (isItNode) {
-                scopeOrReducer = node.data;
+            let obj;
+            const is_node = isNode(node);
+            if (is_node) {
+                obj = node.data;
             } else {
-                scopeOrReducer = node;
+                obj = node;
             }
 
-            for (const key in scopeOrReducer) {
-                if (!scopeOrReducer.hasOwnProperty(key)) {
+            if (isGlobalReducer(obj)) {
+                return children;
+            }
+
+            for (const key in obj) {
+                if (!obj.hasOwnProperty(key)) {
                     continue;
                 }
-                if (isGlobalScope(scopeOrReducer[key])) {
+                const gblObj = obj[key];
+                if (isGlobalScope(gblObj)) {
                     children.push({
                         $$__nodeType: 'scope',
                         name: key,
-                        data: scopeOrReducer[key].scope,
-                        parent: isItNode ? node : null,
+                        data: gblObj.scope,
+                        parent: is_node ? node : null,
                         useScopes: {},
                         useReducer: {},
                     });
-                    if (isItNode) {
+                    if (is_node) {
                         node.useScopes[key] = key;
                     }
                 }
-                if (isGlobalReducer(scopeOrReducer[key])) {
+                if (isGlobalReducer(gblObj)) {
                     children.push({
                         $$__nodeType: 'reducer',
                         name: key,
-                        data: scopeOrReducer[key],
-                        parent: isItNode ? node : null,
+                        data: gblObj,
+                        parent: is_node ? node : null,
                         useScopes: {},
                         useReducer: {},
                     });
-                    if (isItNode) {
+                    if (is_node) {
                         node.useReducer[key] = key;
                     }
                 }
@@ -256,15 +261,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
     return React.memo(ContextNode);
 };
 
-
-// type ReturnUseGlobalScope<T extends {}> = {
-//     [P in keyof T]:
-//         T[P] extends Scope<any>
-//             ? ReturnUseGlobalScope<T[P]>
-//             : [T[P], SetStateType<T[P]>]
-// };
-
-type ReturnUseGlobalScope<T> = {
+type ReturnUseGlobalScope<T extends {}> = {
     [P in keyof T]:
         T[P] extends GlobalScope
             ? ReturnUseGlobalScope<T[P]> & Scope
@@ -275,7 +272,7 @@ export const useGlobalScope = <T extends Record<string, any>>
 (name: string): ReturnUseGlobalScope<T> & Scope => {
     const Context = contextByScopeName.get(name) as Context<T & Scope> | undefined;
     if (!Context) {
-        throw new Error(`GlobalState scope '${name}' is not exist`)
+        throw new Error(`Global Scope '${name}' is not exist`)
     }
     return useContext(Context);
 };
