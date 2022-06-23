@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createMultiGlobalScopes } from '../../src/GlobalState/GlobalState';
-import { GlobalScope } from '../../src/GlobalState/Scope';
+import { GlobalScope } from '../../src/GlobalState/GlobalScope';
 import { GlobalReducer } from '../../src/GlobalState/Reducer';
 import App from './App';
 

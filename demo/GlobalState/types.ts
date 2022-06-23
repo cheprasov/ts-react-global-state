@@ -1,5 +1,3 @@
-import { GlobalScope } from '../../src/GlobalState/Scope';
-
 export type UserScopeInf = {
     name: string;
     city: string;

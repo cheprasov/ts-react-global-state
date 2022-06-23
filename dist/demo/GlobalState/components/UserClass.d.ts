@@ -1,10 +1,10 @@
 import React from 'react';
-import { GlobalScopeType } from '../../../src/GlobalState/types';
+import { ScopeStatesType } from '../../../src/GlobalState/types';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 interface UserProps {
     role: string;
-    userGlobalScope?: GlobalScopeType<UserScopeInf>;
-    configGlobalScope?: GlobalScopeType<ConfigScopeInf>;
+    userGlobalScope?: ScopeStatesType<UserScopeInf>;
+    configGlobalScope?: ScopeStatesType<ConfigScopeInf>;
 }
 export default class UserClass extends React.Component<React.PropsWithChildren<UserProps>> {
     decrementAge: () => void;

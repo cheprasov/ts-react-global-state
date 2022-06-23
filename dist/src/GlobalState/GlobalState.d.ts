@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { GlobalScope, Scope } from './Scope';
+import { GlobalScope } from './GlobalScope';
+import { Scope } from './Scope';
 import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;

@@ -1,12 +1,12 @@
 import React from 'react';
 import { withGlobalScope } from '../../../src/GlobalState/GlobalState';
-import { GlobalScopeType } from '../../../src/GlobalState/types';
+import { ScopeStatesType } from '../../../src/GlobalState/types';
 import { ConfigScopeInf, UserScopeInf } from '../types';
 
 interface UserProps {
     role: string;
-    userGlobalScope?: GlobalScopeType<UserScopeInf>;
-    configGlobalScope?: GlobalScopeType<ConfigScopeInf>;
+    userGlobalScope?: ScopeStatesType<UserScopeInf>;
+    configGlobalScope?: ScopeStatesType<ConfigScopeInf>;
 }
 
 export default class UserClass extends React.Component<React.PropsWithChildren<UserProps>> {
@@ -14,14 +14,14 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
     decrementAge = () => {
         if (this.props.userGlobalScope) {
             const [ , setAge ] = this.props.userGlobalScope.age;
-            setAge((value: number) => value - 1);
+            setAge && setAge((value: number) => value - 1);
         }
     }
 
     increaseAge = () => {
         if (this.props.userGlobalScope) {
             const [ , setAge ] = this.props.userGlobalScope.age;
-            setAge((value: number) => value + 1);
+            setAge && setAge((value: number) => value + 1);
         }
     }
 

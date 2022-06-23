@@ -1,4 +1,4 @@
-import { GlobalScope } from '../../src/GlobalState/Scope';
+import { GlobalScope } from '../../src/GlobalState/GlobalScope';
 
 export interface AppNestedScopeInf {
     app: GlobalScope & {

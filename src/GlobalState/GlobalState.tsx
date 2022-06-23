@@ -8,7 +8,8 @@ import React, {
 import { stringify } from '../string/stringify';
 import { Tree } from '@cheprasov/data-structures';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
-import { GlobalScope, isGlobalScope, Scope } from './Scope';
+import { GlobalScope, isGlobalScope } from './GlobalScope';
+import { Scope } from './Scope';
 import { isFunction } from '../variables/isFunction';
 import { GlobalReducer, isGlobalReducer } from './Reducer';
 

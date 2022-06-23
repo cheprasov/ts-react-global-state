@@ -1,16 +1,6 @@
-export class GlobalScope {
-    public readonly scope: Record<string, any>;
+import { ScopeVariablesInf } from './GlobalState';
 
-    constructor(scope: Record<string, any>) {
-        this.scope = scope;
-    }
-}
-
-export const isGlobalScope = (value: any): value is GlobalScope => {
-    return value instanceof GlobalScope;
-}
-
-export class Scope<T extends Record<string, any> = {}, P = keyof T> {
+export class Scope<T extends ScopeVariablesInf = {}, P = keyof T> {
     [P: string]: any;
 
     constructor(scope: T) {
@@ -19,21 +9,24 @@ export class Scope<T extends Record<string, any> = {}, P = keyof T> {
         }
     }
 
-    toObject() {
+    toObject(): Record<string, any> {
         const result: Record<string, any> = {};
+
         for (let key in this) {
-          if (!this.hasOwnProperty(key)) {
-            continue;
-          }
-          const value = (this as any)[key];
-          if (value instanceof Scope) {
-            result[key] = (value as any).toObject();
-          } else if (Array.isArray(value)) {
-            result[key] = value[0]; // state & reducer
-          }
+            if (!this.hasOwnProperty(key)) {
+                continue;
+            }
+            const value = (this as any)[key];
+            if (value instanceof Scope) {
+                result[key] = (value as any).toObject();
+            } else if (Array.isArray(value)) {
+                result[key] = value[0]; // state & reducer
+            } else {
+                result[key] = value;
+            }
         }
 
         return result;
-      }
+    }
 
 }

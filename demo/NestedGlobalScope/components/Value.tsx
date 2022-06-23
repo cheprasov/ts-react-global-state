@@ -4,7 +4,7 @@ export interface ValueProps{
     list: string[];
     name: string;
     value: string;
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
 };
 
 const Value: React.FC<ValueProps> = ({ list, name, value, onChange }) => {
@@ -15,7 +15,7 @@ const Value: React.FC<ValueProps> = ({ list, name, value, onChange }) => {
         while (newIndex === currentIndex) {
             newIndex = Math.round(Math.random() * (list.length - 1));
         }
-        onChange(list[newIndex]);
+        onChange && onChange(list[newIndex]);
     }, [value, list, onChange]);
 
     return (

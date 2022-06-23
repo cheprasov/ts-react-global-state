@@ -10,9 +10,10 @@ import {
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigScopeInf, UserScopeInf } from '../../demo/GlobalState/types';
-import { GlobalStateType } from '../../dist';
 import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
-import { GlobalScope, Scope } from './Scope';
+import { Scope } from './Scope';
+import { GlobalScope } from './GlobalScope';
+import { ScopeStatesType } from './types';
 
 describe('GlobalScope', () => {
 
@@ -280,7 +281,7 @@ return n;
             contextByScopeName.clear();
         });
 
-        class TestClass extends React.Component<React.PropsWithChildren<{ userScope?: GlobalStateType<UserScopeInf> }>> {
+        class TestClass extends React.Component<React.PropsWithChildren<{ userScope?: ScopeStatesType<UserScopeInf> }>> {
             render() {
                 if (!this.props.userScope) {
                     return (<div className="User">No Scope</div>);
@@ -296,8 +297,8 @@ return n;
         }
 
         class TestClass2 extends React.Component<React.PropsWithChildren<{
-            userScope?: GlobalStateType<UserScopeInf>,
-            configScope?: GlobalStateType<ConfigScopeInf>
+            userScope?: ScopeStatesType<UserScopeInf>,
+            configScope?: ScopeStatesType<ConfigScopeInf>
         }>> {
             render() {
                 if (!this.props.userScope || !this.props.configScope) {
