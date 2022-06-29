@@ -13,10 +13,11 @@ import { Scope } from './Scope';
 import { isFunction } from '../variables/isFunction';
 import { GlobalReducer, isGlobalReducer } from './GlobalReducer';
 
-import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
+import type { ReducerTupleExtendedType, StateTupleExtendedType, ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
 
 export interface ScopeVariablesInf {
-    [key: string]: StateTupleType<any> | ScopeVariablesInf;
+    [key: string]: StateTupleExtendedType<any> | ReducerTupleExtendedType<any, any> | ScopeVariablesInf;
+    //[key: string]: StateTupleType<any> & Partial<GlobalStateTupleExtenderType<any> & GlobalReducerTupleExtenderType<any>> | ScopeVariablesInf;
 }
 
 export const createStateDefiner = (obj: Record<string, any>) => {
@@ -29,11 +30,11 @@ export const createStateDefiner = (obj: Record<string, any>) => {
         body.push(`n[${k}] = u(o[${k}]);`);
         body.push(`n[${k}].stateValue = n[${k}][0];`);
         body.push(`n[${k}].setStateValue = n[${k}][1];`);
-        body.push(`n[${k}].isStateTuple = true;`);
+        body.push(`n[${k}].isGlobalState = true;`);
     }
     body.push('return n;');
     return new Function('o', 'u', body.join('\n')) as (
-        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTupleType<any>>
+        (obj: Record<string, any>, use: typeof useState) => Record<string, StateTupleExtendedType<any>>
     );
 }
 
@@ -51,6 +52,11 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const state = useState(initialState);
+        type StateTuple = StateTupleExtendedType<typeof state[0]>;
+        (state as StateTuple).isGlobalState = true;
+        (state as StateTuple).stateValue = state[0];
+        (state as StateTuple).setStateValue = state[1];
+
         return (
             <Context.Provider value={state}>
                 {children}
@@ -87,9 +93,15 @@ export const createGlobalReducer = (
     contextByReducerName.set(name, Context);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-        const state = useReducer(reducer, initialState);
+        const stateTuple = useReducer(reducer, initialState);
+        type StateTuple = ReducerTupleExtendedType<typeof stateTuple[0], typeof stateTuple[1]>;
+        (stateTuple as StateTuple).isGlobalReducer = true;
+        (stateTuple as StateTuple).stateValue = stateTuple[0];
+        (stateTuple as StateTuple).setStateValue = stateTuple[1];
+        (stateTuple as StateTuple).dispatchStateValue = stateTuple[1];
+
         return (
-            <Context.Provider value={state}>
+            <Context.Provider value={stateTuple}>
                 {children}
             </Context.Provider>
         );
@@ -98,8 +110,8 @@ export const createGlobalReducer = (
     return React.memo(ContextNode);
 };
 
-export const useGlobalReducer = <T,D>(name: string): ReducerTupleType<T, D> => {
-    const Context = contextByReducerName.get(name) as Context<ReducerTupleType<T, D>> | undefined;
+export const useGlobalReducer = <T,D>(name: string): ReducerTupleExtendedType<T, D> => {
+    const Context = contextByReducerName.get(name) as Context<ReducerTupleExtendedType<T, D>> | undefined;
     if (!Context) {
         throw new Error(`Global Reducer '${name}' is not exist`);
     }

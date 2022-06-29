@@ -1,12 +1,12 @@
 import { GlobalScope } from './GlobalScope';
 import { ScopeVariablesInf } from './GlobalState';
-import { isStateTupleExtenderType, SetStateType, StateTupleExtenderType } from './types';
+import { isStateTupleExtendedType, SetStateType, StateTupleExtendedType } from './types';
 
 export type Scope<T> = {
     [P in keyof T]:
         T[P] extends GlobalScope<any>
             ? Scope<T[P]>
-            : [T[P], SetStateType<T[P]>] & StateTupleExtenderType<T[P]>
+            : StateTupleExtendedType<T[P]>
 } & ScopeMethods;
 
 interface ScopeMethods {
@@ -34,7 +34,7 @@ export const Scope = class <T extends {}> {
             const value = this[key];
             if (value instanceof Scope) {
                 result[key] = (value as any).toObject();
-            } else if (isStateTupleExtenderType(value)) {
+            } else if (isStateTupleExtendedType(value)) {
                 result[key] = value[0]; // state & reducer
             }
         }
@@ -58,7 +58,7 @@ export const Scope = class <T extends {}> {
 
             if (value instanceof Scope) {
                 value.fromObject(objValue);
-            } else if (isStateTupleExtenderType<typeof value>(value)) {
+            } else if (isStateTupleExtendedType<typeof value>(value)) {
                 value.setStateValue(objValue);
             }
         }

@@ -20,7 +20,7 @@ function App() {
       appScope.user.name.setStateValue(r as any);
       appScope.user.city.setStateValue(r as any);
       appScope.user.age.setStateValue(r as any);
-    }, 5000);
+    }, 1000);
 
     setTimeout(() => {
       const r = Math.random().toString(36);
@@ -54,7 +54,7 @@ function App() {
             },
           },
         });
-    }, 10000);
+    }, 2000);
 
   }, []);
 

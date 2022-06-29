@@ -1,7 +1,7 @@
 import { GlobalScope } from './GlobalScope';
-import { SetStateType, StateTupleExtenderType } from './types';
+import { StateTupleExtendedType } from './types';
 export declare type Scope<T> = {
-    [P in keyof T]: T[P] extends GlobalScope<any> ? Scope<T[P]> : [T[P], SetStateType<T[P]>] & StateTupleExtenderType<T[P]>;
+    [P in keyof T]: T[P] extends GlobalScope<any> ? Scope<T[P]> : StateTupleExtendedType<T[P]>;
 } & ScopeMethods;
 interface ScopeMethods {
     toObject(): Record<string, any>;
