@@ -11,7 +11,7 @@ import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
 import { GlobalScope, isGlobalScope } from './GlobalScope';
 import { Scope } from './Scope';
 import { isFunction } from '../variables/isFunction';
-import { GlobalReducer, isGlobalReducer } from './Reducer';
+import { GlobalReducer, isGlobalReducer } from './GlobalReducer';
 
 import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
 
@@ -27,6 +27,9 @@ export const createStateDefiner = (obj: Record<string, any>) => {
         }
         const k = stringify(key);
         body.push(`n[${k}] = u(o[${k}]);`);
+        body.push(`n[${k}].stateValue = n[${k}][0];`);
+        body.push(`n[${k}].setStateValue = n[${k}][1];`);
+        body.push(`n[${k}].isStateTuple = true;`);
     }
     body.push('return n;');
     return new Function('o', 'u', body.join('\n')) as (
@@ -43,7 +46,7 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
 
     const init = isFunction(initialState) ? initialState() : initialState;
 
-    const Context = React.createContext<StateTupleType<S>>([init, undefined]);
+    const Context = React.createContext<StateTupleType<S>>([init, () => {}]);
     contextByStateName.set(name, Context);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
@@ -80,7 +83,7 @@ export const createGlobalReducer = (
 
     const init = isFunction(initializer) ? initializer(initialState) : initialState;
 
-    const Context = React.createContext<ReducerTupleType<any, any>>([init, undefined]);
+    const Context = React.createContext<ReducerTupleType<any, any>>([init, () => {}]);
     contextByReducerName.set(name, Context);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
@@ -118,7 +121,7 @@ export const createGlobalScope = (
     const scopeCopy = { ...scope };
 
     const initScope = Object.entries(scopeCopy).reduce((acc, [key, value]) => {
-        acc[key] = [value, undefined];
+        acc[key] = [value, () => {}];
         return acc;
     }, {} as Record<string, any>);
 
@@ -200,7 +203,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
                     children.push({
                         $$__nodeType: 'scope',
                         name: key,
-                        data: gblObj.scope,
+                        data: gblObj,
                         parent: is_node ? node : null,
                         useScopes: {},
                         useReducer: {},
@@ -256,16 +259,21 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
     return React.memo(ContextNode);
 };
 
-type ReturnUseGlobalScope<T extends {}> = {
-    [P in keyof T]:
-        T[P] extends GlobalScope
-            ? ReturnUseGlobalScope<T[P]> & Scope
-            : [T[P], SetStateType<T[P]>]
+
+
+type GetObjectKeys<T> = {
+    [K in keyof T]: T[K];
 };
 
-export const useGlobalScope = <T extends Record<string, any>>
-(name: string): ReturnUseGlobalScope<T> & Scope => {
-    const Context = contextByScopeName.get(name) as Context<T & Scope> | undefined;
+// type ReturnUseGlobalScope<T extends {}> = {
+//     [P in keyof GetObjectKeys<T>]:
+//         T[P] extends GlobalScope<any>
+//             ? Scope & ReturnUseGlobalScope<GetObjectKeys<T[P]>>
+//             : [T[P], SetStateType<T[P]>] & SetValueExtender<T[P]>
+// };
+
+export const useGlobalScope = <T extends Record<string, any>>(name: string): Scope<T> => {
+    const Context = contextByScopeName.get(name) as Context<T & Scope<T>> | undefined;
     if (!Context) {
         throw new Error(`Global Scope '${name}' is not exist`)
     }

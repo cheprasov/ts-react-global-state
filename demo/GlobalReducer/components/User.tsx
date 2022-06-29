@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useGlobalReducer, useGlobalScope, useGlobalState } from '../../../src/GlobalState/GlobalState';
+import { useGlobalReducer } from '../../../src/GlobalState/GlobalState';
 import { UserStateInf } from '../types';
 
 const User: React.FC = () => {
@@ -7,14 +7,11 @@ const User: React.FC = () => {
     const [user, dispath] = useGlobalReducer<UserStateInf, any>('user');
 
     const increaseAge = () => {
-        // `set function` has the same API like a `set function` from React.useState()
-        dispath && dispath({ type: 'age/increment' });
-        // or
-        // setAge(38);
+        dispath({ type: 'age/increment' });
     }
 
     const decrementAge = () => {
-        dispath && dispath({ type: 'age/decrement' });
+        dispath({ type: 'age/decrement' });
     }
 
     useEffect(() => {

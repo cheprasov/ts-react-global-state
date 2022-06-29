@@ -1,19 +1,19 @@
 import { GlobalScope } from '../../src/GlobalState/GlobalScope';
 export interface AppNestedScopeInf {
-    app: GlobalScope & {
-        settings: GlobalScope & {
+    app: GlobalScope<{
+        settings: GlobalScope<{
             priceType: string;
-        };
-        user: GlobalScope & {
+        }>;
+        user: GlobalScope<{
             name: string;
             city: string;
             age: number;
-            hobby: GlobalScope & {
+            hobby: GlobalScope<{
                 chess: string;
                 it: string;
-            };
-        };
-        search: GlobalScope & {
+            }>;
+        }>;
+        search: GlobalScope<{
             departure: string;
             destination: string;
             date: number;
@@ -22,13 +22,13 @@ export interface AppNestedScopeInf {
                 children?: number;
             }[];
             nights: number;
-            filters: GlobalScope & {
+            filters: GlobalScope<{
                 rating: number;
                 price: {
                     min: number;
                     max: number;
                 };
-            };
-        };
-    };
+            }>;
+        }>;
+    }>;
 }

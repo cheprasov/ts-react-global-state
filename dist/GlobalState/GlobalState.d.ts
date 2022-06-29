@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GlobalScope } from './GlobalScope';
 import { Scope } from './Scope';
-import type { ReducerTupleType, SetStateType, StateTupleType, StateValueType } from './types';
+import type { ReducerTupleType, StateTupleType, StateValueType } from './types';
 export interface ScopeVariablesInf {
     [key: string]: StateTupleType<any> | ScopeVariablesInf;
 }
@@ -26,9 +26,6 @@ interface MultiScope {
 export declare const createMultiGlobalScopes: (scopes: MultiScope) => React.NamedExoticComponent<{
     children?: React.ReactNode;
 }>;
-declare type ReturnUseGlobalScope<T extends {}> = {
-    [P in keyof T]: T[P] extends GlobalScope ? ReturnUseGlobalScope<T[P]> & Scope : [T[P], SetStateType<T[P]>];
-};
-export declare const useGlobalScope: <T extends Record<string, any>>(name: string) => ReturnUseGlobalScope<T> & Scope<{}, never>;
+export declare const useGlobalScope: <T extends Record<string, any>>(name: string) => Scope<T>;
 export declare const withGlobalScope: <P extends object>(Component: React.ComponentType<P>, scopeToProp: Record<string, string>) => React.FC<P>;
 export {};

@@ -1,21 +1,36 @@
 # Changelog
 
+## [2.0.0] - 2022-06-13
 
-## [1.2.0] - Unreleased
+### Changed
+
+- Function `createMultiGlobalStates` renamed to  `createMultiGlobalScopes`.
+- Function `createGlobalState` renamed to  `createGlobalScope`.
+- Function `useGlobalState` renamed to  `useGlobalScope`.
+- Function `withGlobalState` renamed to  `withGlobalScope`.
+- Class `new GlobalScope()` should be used for definition inside nested scopes instead of function `Scope`.
+- Class `new GlobalReducer()` should be used for definition inside nested scopes.
 
 ### Added
 
-- Added function `createMultiGlobalScopes` for creating multi and/or nested scopes.
-- Added otional param `useScope` for `createGlobalScope` that allows to have references through scopes.
+- Added functions `createGlobalState`, `createGlobalReducer`, `useGlobalState`, `useGlobalReducer`.
+
+
+## [1.2.0] - 2022-06-13
+
+### Added
+
+- Added function `createMultiGlobalStates` for creating multi and/or nested scopes.
+- Added otional param `useScope` for `createGlobalState` that allows to have references through scopes.
 
 ## [1.1.0] - 2022-05-12
 
 ### Added
 
-- Added function `withGlobalScope`. It allows to use Global State at Class Components.
+- Added function `withGlobalState`. It allows to use Global State at Class Components.
 
 ## [1.0.0] - 2022-05-03
 
 ### Added
 
-- Created functions `create Global State` and `use Global State` which allows to use Global State at Function Components.
+- Created functions `createGlobalState` and `useGlobalState` which allows to use Global State at Function Components.

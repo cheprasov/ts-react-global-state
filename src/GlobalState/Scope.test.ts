@@ -5,7 +5,7 @@ describe('Scope', () => {
     describe('instance', () => {
         it('should create a new instance of Scope', () => {
             const obj = {
-                foo: ['bar', undefined],
+                foo: ['bar', () => {}],
             } as ScopeVariablesInf;
             const scope = new Scope(obj);
             expect(scope).toBeInstanceOf(Scope);
@@ -15,7 +15,7 @@ describe('Scope', () => {
             const obj = {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
-                user: [{name: 'Alex'}, undefined],
+                user: [{name: 'Alex'}, () => {}],
             } as ScopeVariablesInf;
             const scope = new Scope(obj) as Scope & typeof obj;
             expect(scope).toEqual(obj);
@@ -29,7 +29,7 @@ describe('Scope', () => {
             const obj = {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
-                user: [{name: 'Alex'}, undefined],
+                user: [{name: 'Alex'}, () => {}],
             } as ScopeVariablesInf;
             const scope = new Scope(obj);
             expect(Object.keys(scope).sort()).toEqual(Object.keys(obj).sort());
@@ -52,9 +52,7 @@ describe('Scope', () => {
             const obj = {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
-                user: [
-                    { name: 'Alex' }, undefined,
-                ],
+                user: [{ name: 'Alex' }, () => {}],
             } as ScopeVariablesInf;
             const scope = new Scope(obj) as Scope & typeof obj;
             expect(scope.toObject()).toEqual({
@@ -69,7 +67,7 @@ describe('Scope', () => {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
                 user: new Scope({
-                    name: ['Alex', undefined],
+                    name: ['Alex', () => {}],
                     hobby: new Scope({
                         it: ['expert', () => {}],
                         chess: ['beginner', () => {}],

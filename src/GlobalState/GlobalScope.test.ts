@@ -1,4 +1,3 @@
-import { ScopeVariablesInf } from './GlobalState';
 import { isGlobalScope, GlobalScope } from './GlobalScope';
 
 describe('GlobalScope', () => {

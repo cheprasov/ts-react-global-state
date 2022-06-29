@@ -14,14 +14,14 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
     decrementAge = () => {
         if (this.props.userGlobalScope) {
             const [ , setAge ] = this.props.userGlobalScope.age;
-            setAge && setAge((value: number) => value - 1);
+            setAge((value: number) => value - 1);
         }
     }
 
     increaseAge = () => {
         if (this.props.userGlobalScope) {
             const [ , setAge ] = this.props.userGlobalScope.age;
-            setAge && setAge((value: number) => value + 1);
+            setAge((value: number) => value + 1);
         }
     }
 

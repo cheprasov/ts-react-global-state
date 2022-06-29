@@ -4,7 +4,7 @@ export interface ValueProps{
     list: string[];
     name: string;
     value: string;
-    onChange?: (value: string) => void;
+    onChange: (value: string) => void;
 };
 
 const Value: React.FC<ValueProps> = ({ list, name, value, onChange }) => {
