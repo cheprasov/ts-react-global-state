@@ -6,13 +6,13 @@ interface GlobalScopeInf {
     new <T>(data: T): GlobalScope<T>
 }
 
-export const GlobalScope = class <T> {
+ export const GlobalScope = class <T> {
     constructor(data: T) {
-        Object.assign(this, data)
+      Object.assign(this, data)
     }
-} as GlobalScopeInf;
+  } as GlobalScopeInf;
 
-// 2const obj = new Md({ a: 1, b: 2 });
+  // 2const obj = new Md({ a: 1, b: 2 });
 
 // export class GlobalScope<T> {
 //     constructor(data: T) {

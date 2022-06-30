@@ -1,3 +1,4 @@
-/// <reference types="react" />
+import React from 'react';
 declare function App(): JSX.Element;
-export default App;
+declare const _default: React.MemoExoticComponent<typeof App>;
+export default _default;

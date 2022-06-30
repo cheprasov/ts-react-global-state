@@ -1,17 +1,21 @@
+import { GlobalReducer } from './GlobalReducer';
 import { GlobalScope } from './GlobalScope';
-import { ScopeVariablesInf } from './GlobalState';
-import { isStateTupleExtendedType, SetStateType, StateTupleExtendedType } from './types';
+import { isReducerTupleExtendedType, isStateTupleExtendedType, ReducerTupleExtendedType, SetStateType, StateTupleExtendedType } from './types';
 
-export type Scope<T> = {
-    [P in keyof T]:
-        T[P] extends GlobalScope<any>
-            ? Scope<T[P]>
-            : StateTupleExtendedType<T[P]>
-} & ScopeMethods;
+export type Scope<T> =
+    T extends GlobalReducer<any>
+    ? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
+    : (
+        T extends GlobalScope<any>
+        ? {
+            [P in keyof T]: Scope<T[P]>
+        } & ScopeMethods
+        :  StateTupleExtendedType<T>
+    );
 
 interface ScopeMethods {
     toObject(): Record<string, any>;
-    fromObject(obj: Record<string, any>): void;
+    fromObject(obj: any): void;
 }
 
 interface ScopeInf {
@@ -32,10 +36,12 @@ export const Scope = class <T extends {}> {
                 continue;
             }
             const value = this[key];
-            if (value instanceof Scope) {
-                result[key] = (value as any).toObject();
+            if (isScopeInstance(value)) {
+                result[key] = value.toObject();
+            } else if (isReducerTupleExtendedType<any, any>(value)) {
+                result[key] = 'toObject' in value.stateValue ? value.stateValue.toObject() : value.stateValue;
             } else if (isStateTupleExtendedType(value)) {
-                result[key] = value[0]; // state & reducer
+                result[key] = value.stateValue; // state & reducer
             }
         }
 
@@ -54,10 +60,12 @@ export const Scope = class <T extends {}> {
                 continue;
             }
             const objValue = obj[key];
-            const value = (this as T)[key];
+            const value = this[key];
 
-            if (value instanceof Scope) {
+            if (isScopeInstance(value)) {
                 value.fromObject(objValue);
+            } else if (isReducerTupleExtendedType<any, any>(value)) {
+               value.dispatchStateValue({ type: 'init', init: objValue });
             } else if (isStateTupleExtendedType<typeof value>(value)) {
                 value.setStateValue(objValue);
             }
@@ -65,3 +73,7 @@ export const Scope = class <T extends {}> {
     }
 
 } as ScopeInf;
+
+export const isScopeInstance = <T>(value: any): value is Scope<T> & ScopeMethods => {
+    return value instanceof Scope;
+}

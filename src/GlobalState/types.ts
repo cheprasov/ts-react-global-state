@@ -11,18 +11,23 @@ export type OpenPropsType<T extends Record<string, any>> = {
 };
 
 export type StateTupleExtendedType<T> = StateTupleType<T> & {
-    isGlobalState: true;
+    globalState: true;
     stateValue: T;
     setStateValue: SetStateType<T>;
 };
 
+export const isStateTupleExtendedType = <T>(value: any | StateTupleExtendedType<T>): value is StateTupleExtendedType<T> => {
+    return Array.isArray(value) && value.length === 2 && 'globalState' in value;
+}
+
 export type ReducerTupleExtendedType<T, D> = ReducerTupleType<T, D> & {
-    isGlobalReducer: true;
+    globalReducer: true;
     stateValue: T;
     setStateValue: React.Dispatch<D>;
     dispatchStateValue: React.Dispatch<D>;
 };
 
-export const isStateTupleExtendedType = <T>(value: any | StateTupleExtendedType<T>): value is StateTupleExtendedType<T> => {
-    return Array.isArray(value) && value.length === 2 && 'isGlobalState' in value;
+
+export const isReducerTupleExtendedType = <T, D>(value: any | ReducerTupleExtendedType<T, D>): value is ReducerTupleExtendedType<T, D> => {
+    return Array.isArray(value) && value.length === 2 && 'globalReducer' in value;
 }

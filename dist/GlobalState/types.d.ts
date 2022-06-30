@@ -10,14 +10,15 @@ export declare type OpenPropsType<T extends Record<string, any>> = {
     [P in keyof T]: T[P];
 };
 export declare type StateTupleExtendedType<T> = StateTupleType<T> & {
-    isGlobalState: true;
+    globalState: true;
     stateValue: T;
     setStateValue: SetStateType<T>;
 };
+export declare const isStateTupleExtendedType: <T>(value: any) => value is StateTupleExtendedType<T>;
 export declare type ReducerTupleExtendedType<T, D> = ReducerTupleType<T, D> & {
-    isGlobalReducer: true;
+    globalReducer: true;
     stateValue: T;
     setStateValue: React.Dispatch<D>;
     dispatchStateValue: React.Dispatch<D>;
 };
-export declare const isStateTupleExtendedType: <T>(value: any) => value is StateTupleExtendedType<T>;
+export declare const isReducerTupleExtendedType: <T, D>(value: any) => value is ReducerTupleExtendedType<T, D>;

@@ -30,7 +30,7 @@ export const createStateDefiner = (obj: Record<string, any>) => {
         body.push(`n[${k}] = u(o[${k}]);`);
         body.push(`n[${k}].stateValue = n[${k}][0];`);
         body.push(`n[${k}].setStateValue = n[${k}][1];`);
-        body.push(`n[${k}].isGlobalState = true;`);
+        body.push(`n[${k}].globalState = true;`);
     }
     body.push('return n;');
     return new Function('o', 'u', body.join('\n')) as (
@@ -53,7 +53,7 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const state = useState(initialState);
         type StateTuple = StateTupleExtendedType<typeof state[0]>;
-        (state as StateTuple).isGlobalState = true;
+        (state as StateTuple).globalState = true;
         (state as StateTuple).stateValue = state[0];
         (state as StateTuple).setStateValue = state[1];
 
@@ -95,7 +95,7 @@ export const createGlobalReducer = (
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const stateTuple = useReducer(reducer, initialState);
         type StateTuple = ReducerTupleExtendedType<typeof stateTuple[0], typeof stateTuple[1]>;
-        (stateTuple as StateTuple).isGlobalReducer = true;
+        (stateTuple as StateTuple).globalReducer = true;
         (stateTuple as StateTuple).stateValue = stateTuple[0];
         (stateTuple as StateTuple).setStateValue = stateTuple[1];
         (stateTuple as StateTuple).dispatchStateValue = stateTuple[1];
@@ -179,7 +179,7 @@ interface MultiScope {
 interface Node {
     $$__nodeType: 'scope' | 'reducer';
     name: string;
-    data: Record<string, any> | GlobalReducer;
+    data: Record<string, any> | GlobalReducer<any>;
     parent: Node | null;
     useScopes: Record<string, string>;
     useReducer: Record<string, string>;
@@ -254,7 +254,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
             return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer);
         }
         if (scopeNode.$$__nodeType === 'reducer' && isGlobalReducer(scopeNode.data)) {
-            const globalReducer = scopeNode.data as GlobalReducer;
+            const globalReducer = scopeNode.data as GlobalReducer<any>;
             return createGlobalReducer(scopeNode.name, globalReducer.reducer, globalReducer.initialState, globalReducer.initializer);
         }
         return ({ children }: any) => children;

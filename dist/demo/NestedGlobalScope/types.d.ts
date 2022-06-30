@@ -1,8 +1,12 @@
+import { GlobalReducer } from '../../src/GlobalState/GlobalReducer';
 import { GlobalScope } from '../../src/GlobalState/GlobalScope';
 export interface AppNestedScopeInf {
     app: GlobalScope<{
         settings: GlobalScope<{
             priceType: string;
+        }>;
+        counter: GlobalReducer<{
+            counter: number;
         }>;
         user: GlobalScope<{
             name: string;
