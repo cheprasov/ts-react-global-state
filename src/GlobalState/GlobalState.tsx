@@ -17,7 +17,6 @@ import type { ReducerTupleExtendedType, StateTupleExtendedType, ReducerTupleType
 
 export interface ScopeVariablesInf {
     [key: string]: StateTupleExtendedType<any> | ReducerTupleExtendedType<any, any> | ScopeVariablesInf;
-    //[key: string]: StateTupleType<any> & Partial<GlobalStateTupleExtenderType<any> & GlobalReducerTupleExtenderType<any>> | ScopeVariablesInf;
 }
 
 export const createStateDefiner = (obj: Record<string, any>) => {
@@ -67,8 +66,8 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
     return React.memo(ContextNode);
 };
 
-export const useGlobalState = <T,>(name: string): StateTupleType<T> => {
-    const Context = contextByStateName.get(name) as Context<StateTupleType<T>> | undefined;
+export const useGlobalState = <T,>(name: string): StateTupleExtendedType<T> => {
+    const Context = contextByStateName.get(name) as Context<StateTupleExtendedType<T>> | undefined;
     if (!Context) {
         throw new Error(`Global State '${name}' is not exist`);
     }

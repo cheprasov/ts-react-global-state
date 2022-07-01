@@ -1,12 +1,20 @@
 import { ScopeVariablesInf } from './GlobalState';
 import { Scope } from './Scope';
+import { StateTupleExtendedType } from './types';
+
+const extendStateTuple = (arr: Array<any>) => {
+    (arr as StateTupleExtendedType<any>).globalState = true;
+    (arr as StateTupleExtendedType<any>).stateValue = arr[0];
+    (arr as StateTupleExtendedType<any>).setStateValue = arr[1];
+    return arr;
+}
 
 describe('Scope', () => {
     describe('instance', () => {
         it('should create a new instance of Scope', () => {
             const obj = {
                 foo: ['bar', () => {}],
-            } as ScopeVariablesInf;
+            } as any;
             const scope = new Scope(obj);
             expect(scope).toBeInstanceOf(Scope);
         });
@@ -16,8 +24,8 @@ describe('Scope', () => {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
                 user: [{name: 'Alex'}, () => {}],
-            } as ScopeVariablesInf;
-            const scope = new Scope(obj) as Scope & typeof obj;
+            } as any;
+            const scope = new Scope(obj) as any;
             expect(scope).toEqual(obj);
             expect(scope).not.toBe(obj);
             expect(scope.foo).toEqual(obj.foo);
@@ -30,7 +38,7 @@ describe('Scope', () => {
                 foo: ['bar', () => 'baz'],
                 bar: [42, () => 43],
                 user: [{name: 'Alex'}, () => {}],
-            } as ScopeVariablesInf;
+            } as any;
             const scope = new Scope(obj);
             expect(Object.keys(scope).sort()).toEqual(Object.keys(obj).sort());
             const ownKeys: string[] = [];
@@ -43,18 +51,18 @@ describe('Scope', () => {
                 }
             }
             expect(ownKeys.sort()).toEqual(Object.keys(obj).sort());
-            expect(otherKeys.sort()).toEqual(['toObject']);
+            expect(otherKeys.sort()).toEqual(['fromObject', 'toObject']);
         });
     });
 
     describe('toObject', () => {
         it('should return object', () => {
             const obj = {
-                foo: ['bar', () => 'baz'],
-                bar: [42, () => 43],
-                user: [{ name: 'Alex' }, () => {}],
-            } as ScopeVariablesInf;
-            const scope = new Scope(obj) as Scope & typeof obj;
+                foo: extendStateTuple(['bar', () => 'baz']),
+                bar: extendStateTuple([42, () => 43]),
+                user: extendStateTuple([{ name: 'Alex' }, () => {}]),
+            } as any;
+            const scope = new Scope(obj) as any;
             expect(scope.toObject()).toEqual({
                 foo: 'bar',
                 bar: 42,
@@ -64,17 +72,17 @@ describe('Scope', () => {
 
         it('should process correct nested scopes', () => {
             const obj = {
-                foo: ['bar', () => 'baz'],
-                bar: [42, () => 43],
+                foo: extendStateTuple(['bar', () => 'baz']),
+                bar: extendStateTuple([42, () => 43]),
                 user: new Scope({
-                    name: ['Alex', () => {}],
+                    name: extendStateTuple(['Alex', () => {}]),
                     hobby: new Scope({
-                        it: ['expert', () => {}],
-                        chess: ['beginner', () => {}],
+                        it: extendStateTuple(['expert', () => {}]),
+                        chess: extendStateTuple(['beginner', () => {}]),
                     })
                 }),
-            } as ScopeVariablesInf;
-            const scope = new Scope(obj) as Scope & typeof obj;
+            } as any;
+            const scope = new Scope(obj) as any;
             expect(scope.toObject()).toEqual({
                 foo: 'bar',
                 bar: 42,

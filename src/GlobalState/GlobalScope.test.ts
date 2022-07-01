@@ -10,12 +10,40 @@ describe('GlobalScope', () => {
         expect(scope).not.toBe(obj);
     });
 
-    it('should return scope from the instance', () => {
+
+    it('should allow to access all passed props', () => {
         const obj = {
-            foo: 'bar',
+            foo: 'foo42',
+            bar: 42,
+            user: { name: 'Alex' },
         };
-        const gs = new GlobalScope(obj);
-        expect(gs.scope).toBe(obj);
+        const scope = new GlobalScope(obj) as any;
+        expect(scope).toEqual(obj);
+        expect(scope).not.toBe(obj);
+        expect(scope.foo).toEqual(obj.foo);
+        expect(scope.bar).toEqual(obj.bar);
+        expect(scope.user).toEqual(obj.user);
+    });
+
+    it('should return only passed props for iteration', () => {
+        const obj = {
+            foo: 'foo42',
+            bar: 42,
+            user: { name: 'Alex' },
+        };
+        const scope = new GlobalScope(obj);
+        expect(Object.keys(scope).sort()).toEqual(Object.keys(obj).sort());
+        const ownKeys: string[] = [];
+        const otherKeys: string[] = [];
+        for (const key in scope) {
+            if (scope.hasOwnProperty(key)) {
+                ownKeys.push(key);
+            } else {
+                otherKeys.push(key);
+            }
+        }
+        expect(ownKeys.sort()).toEqual(Object.keys(obj).sort());
+        expect(otherKeys.sort()).toEqual([]);
     });
 });
 
