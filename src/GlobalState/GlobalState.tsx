@@ -222,8 +222,7 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
                     if (is_node) {
                         node.useScopes[key] = key;
                     }
-                }
-                if (isGlobalReducer(gblObj)) {
+                } else if (isGlobalReducer(gblObj)) {
                     children.push({
                         $$__nodeType: 'reducer',
                         name: key,

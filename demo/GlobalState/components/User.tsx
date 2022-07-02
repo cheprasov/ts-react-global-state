@@ -12,7 +12,6 @@ const User: React.FC = () => {
     //    city: ['London', setCity],
     //    age: [37, setAge]
     // }
-
     // Or think about it like useState for each the scope object property
     // globalState = {
     //    name: useState('Alex'),

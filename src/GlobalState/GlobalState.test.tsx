@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
+    contextByReducerName,
     contextByScopeName,
     contextByStateName,
+    createGlobalReducer,
     createGlobalScope,
     createGlobalState,
     createMultiGlobalScopes,
     createStateDefiner,
+    useGlobalReducer,
     useGlobalScope,
     useGlobalState,
     withGlobalScope,
@@ -44,16 +47,16 @@ describe('GlobalState', () => {
         let stateChecker: jest.Mock;
 
         beforeAll(() => {
-            UserGlobalState = createGlobalState('counter', 'Alex');
+            UserGlobalState = createGlobalState('user', 'Alex');
             stateChecker = jest.fn(v => v);
         });
 
         afterAll(() => {
-            contextByScopeName.clear();
+            contextByStateName.clear();
         });
 
         const User: React.FC = () => {
-            const [ name, setName ] = stateChecker(useGlobalState<string>('counter'));
+            const [ name, setName ] = stateChecker(useGlobalState<string>('user'));
 
             const updateName = () => {
                 setName((name: string) => name + 1);
@@ -79,6 +82,7 @@ describe('GlobalState', () => {
             expect('globalState' in state).toEqual(true);
             expect('stateValue' in state).toEqual(true);
             expect('setStateValue' in state).toEqual(true);
+            expect(state.globalState).toEqual(true);
             expect(state.stateValue).toBe(state[0]);
             expect(state.setStateValue).toBe(state[1]);
         });
@@ -99,6 +103,111 @@ describe('GlobalState', () => {
                 <UserGlobalState>
                     <User />
                 </UserGlobalState>
+            );
+            const button = container.querySelector('.User button') as HTMLButtonElement;
+
+            expect(container.querySelector('.User__name')?.textContent).toEqual('Alex');
+            await userEvent.click(button);
+            expect(container.querySelector('.User__name')?.textContent).toEqual('Alex1');
+            await userEvent.click(button);
+            expect(container.querySelector('.User__name')?.textContent).toEqual('Alex11');
+        });
+    });
+
+});
+
+describe('GlobalReducer', () => {
+
+    describe('createGlobalReducer', () => {
+        afterEach(() => {
+            contextByReducerName.clear();
+        });
+
+        it('should create React.Function component wrapped by React.memo', () => {
+            const GlobalReducer = createGlobalReducer('foo', () => 42, 42);
+            expect(GlobalReducer['$$typeof']).toEqual(Symbol.for('react.memo'));
+        });
+
+        it('should throw an Error if scope created already', () => {
+            createGlobalReducer('foo', () => 42, 42)
+            expect(() => {
+                createGlobalReducer('foo', () => 42, 42)
+            }).toThrowError("Global Reducer 'foo' already exists");
+        });
+    });
+
+    describe('useGlobalReducer', () => {
+        let UserGlobalReducer: any;
+        let stateChecker: jest.Mock;
+
+        beforeAll(() => {
+            UserGlobalReducer = createGlobalReducer(
+                'user',
+                (prevState, action) => {
+                    if (action.type === 'add') {
+                        return prevState + '1';
+                    }
+                    return prevState;
+                },
+                'Alex',
+            );
+            stateChecker = jest.fn(v => v);
+        });
+
+        afterAll(() => {
+            contextByReducerName.clear();
+        });
+
+        const User: React.FC = () => {
+            const [ user, dispath ] = stateChecker(useGlobalReducer('user'));
+
+            const updateName = () => {
+                dispath({ type: 'add'});
+            }
+
+            return (
+                <div className="User">
+                    User Name: <span className="User__name">{user}</span>
+                    <button onClick={updateName}></button>
+                </div>
+            );
+        }
+
+        it('should have special extended reducer tuple', () => {
+            const { container } = render(
+                <UserGlobalReducer>
+                    <User />
+                </UserGlobalReducer>
+            );
+            expect(stateChecker).toBeCalledTimes(1);
+            const state = stateChecker.mock.calls[0][0];
+            expect(state).not.toBeNull();
+            expect('globalReducer' in state).toEqual(true);
+            expect('stateValue' in state).toEqual(true);
+            expect('setStateValue' in state).toEqual(true);
+            expect('dispatchStateValue' in state).toEqual(true);
+            expect(state.globalReducer).toEqual(true);
+            expect(state.stateValue).toBe(state[0]);
+            expect(state.setStateValue).toBe(state[1]);
+            expect(state.dispatchStateValue).toBe(state[1]);
+        });
+
+        it('should use reducer value from GlobalReducer "user"', () => {
+            const { container } = render(
+                <UserGlobalReducer>
+                    <User />
+                </UserGlobalReducer>
+            );
+            const text = container.querySelector('.User__name')?.textContent;
+            expect(text).not.toBeNull();
+            expect(text).toEqual('Alex');
+        });
+
+        it('should update state value from GlobalReducer "user"', async () => {
+            const { container } = render(
+                <UserGlobalReducer>
+                    <User />
+                </UserGlobalReducer>
             );
             const button = container.querySelector('.User button') as HTMLButtonElement;
 

@@ -351,7 +351,7 @@ Please see more examples at [demo folder](/demo/).
 
 ### 3. Documentation
 
-#### 3.1 Creating a Global State
+#### 3.3 Creating a Global Scope
 ```typescript
 createGlobalScope(name: string, scope: Record<string, any>) // Returns React.memo(React.FunctionalComponent)
 ```
@@ -366,12 +366,12 @@ Please note, the `createGlobalScope` should be called once and outside a compone
 
 **Examples:**
 ```typescript
-const UserGlobalState = createGlobalScope('user', { name: 'Alex' });
+const UserGlobalScope = createGlobalScope('user', { name: 'Alex' });
 //...
 root.render(
-    <GlobalState>
+    <UserGlobalScope>
       <App />
-    </GlobalState>
+    </UserGlobalScope>
 );
 ```
 or
@@ -379,7 +379,7 @@ or
 
 import { useGlobalScope } from '@cheprasov/react-global-state';
 
-const UserGlobalState = createGlobalScope('user', { name: 'Alex' });
+const UserGlobalScope = createGlobalScope('user', { name: 'Alex' });
 
 const App: React.FC = () => {
     // ...
@@ -388,19 +388,19 @@ const App: React.FC = () => {
             <SomeComponents>
                 ...
             </SomeComponents>
-            <UserGlobalState>
-                Components here will be able to use the 'user' global state
-            </UserGlobalState>
+            <UserGlobalScope>
+                Components here will be able to use the 'user' global scope
+            </UserGlobalScope>
         </div>
     );
 }
 ```
 
-#### 3.2 Reading / Updating Global State
+#### 3.2 Reading / Updating Global Scope
 ```typescript
 useGlobalScope(name: string) // Returns { [key: string]: [value, setValue function] }
 ```
-The hook function `useGlobalScope(name)` should be used inside Functional Component for getting a scope object with value and set function of Global State.
+The hook function `useGlobalScope(name)` should be used inside a Functional Component for getting a scope object with value and set functions for each state in the scope.
 
 **Params:**
  - name: `string` - Name of scope.
@@ -416,12 +416,12 @@ const userScope = {
     city: 'London',
     age: 37,
 }
-const UserGlobalState = createGlobalScope('user', userScope);
+const UserGlobalScope = createGlobalScope('user', userScope);
 //...
 root.render(
-    <GlobalState>
+    <UserGlobalScope>
       <App />
-    </GlobalState>
+    </UserGlobalScope>
 );
 ```
 and then
@@ -430,23 +430,23 @@ import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
 
-    const globalState = useGlobalScope('user');
-    // globalState = {
+    const globalScope = useGlobalScope('user');
+    // globalScope = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
     //    age: [37, setAge]
     // }
 
     // Or think about it like useState for each the scope object property
-    // globalState = {
+    // globalScope = {
     //    name: useState('Alex'),
     //    city: useState('London'),
     //    age: useState(37)
     // }
 
-    const [ name, setName ] = globalState.name; // like useState
-    const [ city ] = globalState.city; // like useState
-    const [ age, setAge ] = globalState.age; // like useState
+    const [ name, setName ] = globalScope.name; // like useState
+    const [ city ] = globalScope.city; // like useState
+    const [ age, setAge ] = globalScope.age; // like useState
 
     const increaseAge = () => {
         // `set function` has the same API like a `set function` from React.useState()
@@ -463,7 +463,7 @@ const User: React.FC = () => {
     useEffect(() => {
         // shows message if any of scope values is changed
         console.log('Some values of user scope are changed', name, city, age);
-    }, [globalState]);
+    }, [globalScope]);
 
     return (
         <div>
@@ -475,23 +475,23 @@ const User: React.FC = () => {
 }
 ```
 
-#### 3.3 Using Global State at Class Components
+#### 3.3 Using Global Scope at Class Components
 
-For using Global State with Class Component please wrap the Class Component at Functional Component and provide Global State like a property.
+For using Global Scope with Class Component please wrap the Class Component at Functional Component and provide Global Scope like a property.
 
 Example:
 ```javascript
 export default class UserClass extends React.Component<React.PropsWithChildren<UserProps>> {
 
     increaseAge = () => {
-        if (this.props.userGlobalState) {
-            const [ , setAge ] = this.props.userGlobalState.age;
+        if (this.props.userGlobalScope) {
+            const [ , setAge ] = this.props.userGlobalScope.age;
             setAge((value: number) => value + 1);
         }
     }
 
     render() {
-        if (!this.props.userGlobalState) {
+        if (!this.props.userGlobalScope) {
             return (
                 <div>
                     User Scope is not provided
@@ -499,9 +499,9 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
             );
         }
 
-        const [ name ] = this.props.userGlobalState.name; // like useState
-        const [ city ] = this.props.userGlobalState.city; // like useState
-        const [ age ] = this.props.userGlobalState.age; // like useState
+        const [ name ] = this.props.userGlobalScope.name; // like useState
+        const [ city ] = this.props.userGlobalScope.city; // like useState
+        const [ age ] = this.props.userGlobalScope.age; // like useState
 
         return (
             <div>
@@ -516,13 +516,13 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
 
 ```javascript
 const WrappedUserClass = ({ children = undefined }) => {
-    const userState = useGlobalScope('user');
+    const userScope = useGlobalScope('user');
 
-    // you can use as many Global States as you need.
+    // you can use as many Global Scopes as you need.
 
     return (
         <UserClass
-            userState={userState}
+            userGlobalScope={userScope}
         >
             {children}
         </UserClass>
@@ -530,7 +530,7 @@ const WrappedUserClass = ({ children = undefined }) => {
 };
 ```
 
-Or use HOC function `withGlobalScope` that wraps your Class Component automatically for useing Global State.
+Or use HOC function `withGlobalScope` that wraps your Class Component automatically for using Global Scope.
 
 ```typescript
 withGlobalScope(Component: React.Component, scopeToProp: Record<string, string> ) // Returns Higher-Order Component
@@ -538,7 +538,7 @@ withGlobalScope(Component: React.Component, scopeToProp: Record<string, string> 
 
 **Params:**
  - Component: `React.Component` - React.Component for wrapping at Global State.
- - scopeToProp: `Record<string, string>` - Object, where Key is a Global State scope name and Value is name of property that will be used to pass the Global State to the Component. It is allowed to use multiple scopes.
+ - scopeToProp: `Record<string, string>` - Object, where Key is a Global Scope name and Value is name of property that will be used to pass the Global State to the Component. It is allowed to use multiple scopes.
 
 **Returns:**
 - Returns Higher-Order Component
@@ -546,9 +546,9 @@ withGlobalScope(Component: React.Component, scopeToProp: Record<string, string> 
 **Examples:**
 
 ```javascript
-export const UserClassWithGlobalState = withGlobalScope(
+export const UserClassWithGlobalScope = withGlobalScope(
     UserClass, // Original Class, please see above
-    { user: 'userGlobalState' }, // <Global Scope Name for key>: <Class Property Name for value>
+    { user: 'userGlobalScope' }, // <Global Scope Name for key>: <Class Property Name for value>
 );
 ```
 
@@ -604,12 +604,12 @@ const nestedScope = {
   }),
 };
 
-const GlobalStates = createMultiGlobalScopes(nestedScope);
+const GlobalScope = createMultiGlobalScopes(nestedScope);
 
 root.render(
-    <GlobalStates>
+    <GlobalScope>
       <App />
-    </GlobalStates>
+    </GlobalScope>
 );
 ```
 Use:
@@ -624,7 +624,7 @@ const App: React.FC = () => {
     const [ departure, setDeparture ] = app.search.departure; // like useState
 
     // if you need only nested scope like filters
-    const filters = useGlobalScope;('filters')
+    const filters = useGlobalScope('filters');
         const [ rating, setRating ] = filters.rating; // like useState
 
     useEffect(() => {
@@ -641,7 +641,8 @@ const App: React.FC = () => {
 
     useEffect(() => {
         console.log('Rating property of the app.search.filters scope is updated');
-    }, [app.search.filter.rating[0]]);
+    }, [rating]); // or `app.search.filter.rating.stateValue`
+    // Note `app.search.filter.rating.stateValue` is an alias for app.search.filter.rating[0];
 
     return (
         <div className="App">
