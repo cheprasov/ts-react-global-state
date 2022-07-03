@@ -351,7 +351,83 @@ Please see more examples at [demo folder](/demo/).
 
 ### 3. Documentation
 
-#### 3.3 Creating a Global Scope
+#### 3.1. Global State
+
+#### 3.3.1. Creating a Global State
+```typescript
+
+createGlobalState(name: string, initialState: any | (() => any)) // Returns React.memo(React.FunctionalComponent)
+```
+Please note, the `createGlobalState` should be called once and outside a component implementation.
+
+**Params:**
+ - name: `string` - Unique name for the scope.
+ - initialState: `any | (() => any)` - Initial value or function for initialisation an initial value. It has the same API as standard hook `React.useState(initialState: any | (() => any))`
+
+**Returns:**
+ - `React.FunctionalComponent` (Wrapped by React.memo). It should be used inside your application (at any render level) for initialisation Global State feature for children components.
+
+**Examples:**
+```typescript
+import { useGlobalScope } from '@cheprasov/react-global-state';
+
+const UserGlobalState = createGlobalScope('user', 'Alex');
+
+const App: React.FC = () => {
+    // ...
+    return (
+        <div className="App">
+            <SomeComponents>
+                ...
+            </SomeComponents>
+            <UserGlobalState>
+                Components here will be able to use the 'user' global state
+            </UserGlobalState>
+        </div>
+    );
+}
+```
+
+#### 3.3.2. Reading / Updating Global Scope
+```typescript
+useGlobalState(name: string) // Returns { [key: string]: [value, setValue function] }
+```
+The hook `useGlobalState(name)` should be used inside a Functional Component for getting a state with value and set functions.
+
+**Params:**
+ - name: `string` - Name of Global State.
+
+**Returns:**
+- Return an array with value and set value function. `[value, setValue]` (Almost the same like standard hook `React.useState(...)`). The returned array also has additional props:
+    - `globalState` - The property is always `true`.
+    - `stateValue` - The alias for the first `[0]` element in the array;
+    - `setStateValue` - The alias for the second `[1]` element in the array;
+
+**Examples:**
+
+```javascript
+import { useGlobalState } from '@cheprasov/react-global-state';
+
+const User: React.FC = () => {
+
+    const [ name, setName ] = useGlobalState('user'); // like useState
+
+    useEffect(() => {
+        // shows message only if name is changed
+        console.log('Name is changed, new name:', name);
+    }, [name]);
+
+    return (
+        <div>
+            User Name: {name} <br />
+        </div>
+    );
+}
+```
+
+#### 3.3. Global Scope
+
+#### 3.3.1. Creating a Global Scope
 ```typescript
 createGlobalScope(name: string, scope: Record<string, any>) // Returns React.memo(React.FunctionalComponent)
 ```
@@ -396,7 +472,7 @@ const App: React.FC = () => {
 }
 ```
 
-#### 3.2 Reading / Updating Global Scope
+#### 3.3.2. Reading / Updating Global Scope
 ```typescript
 useGlobalScope(name: string) // Returns { [key: string]: [value, setValue function] }
 ```
@@ -475,7 +551,7 @@ const User: React.FC = () => {
 }
 ```
 
-#### 3.3 Using Global Scope at Class Components
+#### 3.3.3. Using Global Scope at Class Components
 
 For using Global Scope with Class Component please wrap the Class Component at Functional Component and provide Global Scope like a property.
 
@@ -552,7 +628,7 @@ export const UserClassWithGlobalScope = withGlobalScope(
 );
 ```
 
-#### 3.4 Creating Nested Global Scopes
+#### 3.3.4. Creating Nested Global Scopes
 ```typescript
 createMultiGlobalScopes(scopes: Object) // Returns React.memo(React.FunctionalComponent)
 ```
