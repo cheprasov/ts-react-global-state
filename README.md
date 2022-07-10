@@ -153,7 +153,7 @@ export default User;
 #### 2.3. Global Scope (Global Collection of states).
 The library's function `createGlobalScope(name: string: scope: Object)` allows to create multi states easy under a global scope. And the hook `useGlobalScope(name: string)` allows to use any state from the global scope like a separate state param.
 
-** Example: **: Creating a Global Scope
+**Example**: Creating a Global Scope
 
 ```typescript
 import { createGlobalScope } from '@cheprasov/react-global-state';
@@ -176,7 +176,7 @@ root.render(
 
 ```
 
-** Example: **: Using Global Scope
+**Example**: Using Global Scope
 
 ```typescript
 import { useGlobalScope } from '@cheprasov/react-global-state';
@@ -252,7 +252,7 @@ export { UserClassWithGlobalScope as UserClass };
 
 #### 2.4. Creating Nested Global Scopes / Multi Global Scopes.
 
-The main idea of the library is operation with Nested Global Scopes. For example, you can created complicated structure of Global Scope with nested Global Scopes and Global Reducers.
+The main idea of the library is operation with Nested Global Scopes. For example, you can created complicated structure of Global Scopes with nested Global Scopes and Global Reducers.
 
 Let's check the example:
 ```typescript
@@ -474,7 +474,7 @@ const App: React.FC = () => {
 
 #### 3.3.2. Reading / Updating Global Scope
 ```typescript
-useGlobalScope(name: string) // Returns { [key: string]: [value, setValue function] }
+useGlobalScope(name: string) // Returns Scope { [key: string]: [value, setValue function] }
 ```
 The hook function `useGlobalScope(name)` should be used inside a Functional Component for getting a scope object with value and set functions for each state in the scope.
 
@@ -482,7 +482,7 @@ The hook function `useGlobalScope(name)` should be used inside a Functional Comp
  - name: `string` - Name of scope.
 
 **Returns:**
-- Scope object like `Record<string, [value, setValue function]}`. Or you could think about the scope like an object with keys and result of call `useState()` for each value: `Record<string, useState(value)}`.
+- `Scope` object like `Record<string, [value, setValue function]}`. Or you could think about the scope like an object with keys and result of call `useState()` for each value: `Record<string, useState(value)}`.
 Note, the returned scope object is always a new object if any of scope's values is updated.
 
 **Examples:**
@@ -730,7 +730,100 @@ const App: React.FC = () => {
     );
 }
 ```
+#### 3.3.5. Import/Export Global Scopes
 
+`useGlobalScope(...)` returns an instance of `Scope` object. The objects has the following methods:
+- `toObject()` - it converts states of scope and nested scopes to JavaScript object. The object could be used any way you want.
+- `fromObject(obj)` - it takes passed object and updates states of the scope and nested scopes.
+
+**Examples:**
+```typescript
+
+import { GlobalScope, GlobalReducer } from '@cheprasov/react-global-state';
+
+const nestedScope = {
+  app: new GlobalScope({
+    settings: new GlobalScope({
+      priceType: 'total',
+    }),
+    user: new GlobalScope({
+      name: 'Alex',
+      city: 'London',
+      age: 37,
+      hobby: { // Not a scope
+        chess: 'beginner',
+        it: 'expert',
+      },
+    }),
+    search: new GlobalScope({
+      departure: 'London',
+      destination: 'Paris',
+      date: Date.now(),
+      rooms: [
+        { adult: 2 },
+      ],
+      nights: 7,
+      filters: new GlobalScope({
+        rating: 5,
+        price: {
+          min: 0,
+          max: 1000,
+        },
+      }),
+    }),
+  }),
+};
+
+const GlobalScope = createMultiGlobalScopes(nestedScope);
+
+root.render(
+    <GlobalScope>
+      <App />
+    </GlobalScope>
+);
+```
+Use:
+```typescript
+
+import { useGlobalScope } from '@cheprasov/react-global-state';
+
+const App: React.FC = () => {
+
+    const app = useGlobalScope('app');
+
+    const [ departure, setDeparture ] = app.search.departure; // like useState
+
+    // if you need only nested scope like filters
+    const filters = useGlobalScope('filters');
+        const [ rating, setRating ] = filters.rating; // like useState
+
+    useEffect(() => {
+        console.log('Any property of the app scope or any nested scope is updated');
+    }, [app]);
+
+     useEffect(() => {
+        console.log('Any property of the app.search scope or any nested scope if app.search is updated');
+    }, [app.search]);
+
+     useEffect(() => {
+        console.log('Any property of the app.search.filters scope is updated');
+    }, [app.search.filter]);
+
+    useEffect(() => {
+        console.log('Rating property of the app.search.filters scope is updated');
+    }, [rating]); // or `app.search.filter.rating.stateValue`
+    // Note `app.search.filter.rating.stateValue` is an alias for app.search.filter.rating[0];
+
+    return (
+        <div className="App">
+            <SomeComponents>
+                ...
+            </SomeComponents>
+            ...
+        </div>
+    );
+}
+```
 
 ## Something does not work
 

@@ -10,10 +10,12 @@
 - Function `withGlobalState` renamed to  `withGlobalScope`.
 - Class `new GlobalScope()` should be used for definition inside nested scopes instead of function `Scope`.
 - Class `new GlobalReducer()` should be used for definition inside nested scopes.
+- `useGlobalScope` returns `Scope` object
 
 ### Added
 
 - Added functions `createGlobalState`, `createGlobalReducer`, `useGlobalState`, `useGlobalReducer`.
+- Added `Scope` object;
 
 
 ## [1.2.0] - 2022-06-13
