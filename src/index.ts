@@ -1,9 +1,14 @@
 export {
     createGlobalState,
-    createMultiGlobalStates,
     useGlobalState,
-    withGlobalState,
-    GlobalStateType,
+    createGlobalReducer,
+    useGlobalReducer,
+    createGlobalScope,
+    createMultiGlobalScopes,
+    useGlobalScope,
+    withGlobalScope,
 } from './GlobalState/GlobalState';
 
-export { Scope, isScope, ScopeInf } from './GlobalState/Scope';
+export { Scope } from './GlobalState/Scope';
+export { GlobalScope } from './GlobalState/GlobalScope';
+export { GlobalReducer } from './GlobalState/GlobalReducer';
