@@ -8,6 +8,8 @@ import { AppNestedScopeInf } from './types';
 function App() {
   const appScope = useGlobalScope<AppNestedScopeInf['app']>('app');
 
+  const [ test, setTest ] = appScope.settings.test;
+
   //@ts-ignore
   console.log(appScope.counter.stateValue.toObject());
   appScope.settings.toObject()
