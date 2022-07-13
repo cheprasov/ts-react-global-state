@@ -8,7 +8,8 @@ import App from './App';
 const nestedScope = {
     app: new GlobalScope({
         settings: new GlobalScope({
-            priceType: 'total' // total | perPerson
+            priceType: 'total', // total | perPerson
+            test: true,
         }),
         counter: new GlobalReducer<{ counter: number, }>(
             (prevState, action) => {

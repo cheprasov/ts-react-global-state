@@ -3,7 +3,9 @@ import { GlobalScope } from './GlobalScope';
 import { ReducerTupleExtendedType, StateTupleExtendedType } from './types';
 export declare type Scope<T> = T extends GlobalReducer<any> ? (ReducerTupleExtendedType<T['initialState'], T['reducer']>) : (T extends GlobalScope<any> ? {
     [P in keyof T]: Scope<T[P]>;
-} & ScopeMethods : StateTupleExtendedType<T>);
+} & ScopeMethods : ([
+    T
+] extends [boolean] ? StateTupleExtendedType<boolean> : StateTupleExtendedType<T>));
 interface ScopeMethods {
     toObject(): Record<string, any>;
     fromObject(obj: any): void;

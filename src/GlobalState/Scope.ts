@@ -10,7 +10,11 @@ export type Scope<T> =
         ? {
             [P in keyof T]: Scope<T[P]>
         } & ScopeMethods
-        :  StateTupleExtendedType<T>
+        :  (
+            [T] extends [boolean]
+            ? StateTupleExtendedType<boolean>
+            : StateTupleExtendedType<T>
+        )
     );
 
 interface ScopeMethods {
