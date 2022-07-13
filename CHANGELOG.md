@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1]
+
+### Changed
+- Fixed `boolean` type for Scope in TypeScript.
+
+
 ## [2.0.0] - 2022-06-13
 
 ### Changed

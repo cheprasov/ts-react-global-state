@@ -5,6 +5,7 @@ export interface AppNestedScopeInf {
     app: GlobalScope<{
         settings: GlobalScope<{
             priceType: string; // total | perPerson
+            test: boolean;
         }>;
         counter: GlobalReducer<{
             counter: number,

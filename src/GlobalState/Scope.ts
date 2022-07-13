@@ -1,6 +1,6 @@
 import { GlobalReducer } from './GlobalReducer';
 import { GlobalScope } from './GlobalScope';
-import { isReducerTupleExtendedType, isStateTupleExtendedType, ReducerTupleExtendedType, SetStateType, StateTupleExtendedType } from './types';
+import { isReducerTupleExtendedType, isStateTupleExtendedType, ReducerTupleExtendedType, SetStateType, StateTupleExtendedType, StateTupleType } from './types';
 
 export type Scope<T> =
     T extends GlobalReducer<any>
@@ -10,7 +10,11 @@ export type Scope<T> =
         ? {
             [P in keyof T]: Scope<T[P]>
         } & ScopeMethods
-        :  StateTupleExtendedType<T>
+        :  (
+            [T] extends [boolean]
+            ? StateTupleExtendedType<boolean>
+            : StateTupleExtendedType<T>
+        )
     );
 
 interface ScopeMethods {

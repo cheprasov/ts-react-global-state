@@ -8,6 +8,8 @@ import { AppNestedScopeInf } from './types';
 function App() {
   const appScope = useGlobalScope<AppNestedScopeInf['app']>('app');
 
+  const [test, setTest] = appScope.settings.test;
+
   //@ts-ignore
   console.log(appScope.counter.stateValue.toObject());
   appScope.settings.toObject()
@@ -33,6 +35,7 @@ function App() {
       appScope.fromObject({
           settings: {
             priceType: 'New total',
+            test: true,
           },
           counter: 42,
           user: {
