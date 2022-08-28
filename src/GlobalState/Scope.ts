@@ -6,14 +6,18 @@ export type Scope<T> =
     T extends GlobalReducer<any>
     ? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
     : (
-        T extends GlobalScope<any>
-        ? {
-            [P in keyof T]: Scope<T[P]>
-        } & ScopeMethods
-        :  (
-            [T] extends [boolean]
-            ? StateTupleExtendedType<boolean>
-            : StateTupleExtendedType<T>
+        T extends Array<any>
+        ? StateTupleExtendedType<T>
+        : (
+            T extends GlobalScope<any>
+            ? {
+                [P in keyof T]: Scope<T[P]>
+            } & ScopeMethods
+            :  (
+                [T] extends [boolean]
+                ? StateTupleExtendedType<boolean>
+                : StateTupleExtendedType<T>
+            )
         )
     );
 
