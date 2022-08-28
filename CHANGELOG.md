@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.2] - 2022-08-28
+
+### Changed
+
+- Fixed TypeScript type checking for `Array` at Scope.
 
 ## [2.0.1] - 2022-07-13
 
