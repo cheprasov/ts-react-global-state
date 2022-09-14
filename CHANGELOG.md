@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.0] - 2022-09-14
+
+### Added
+
+- Function `hydrateGlobalScope(scope: GlobalScope, object: Record<string, any>)` for fill new app scope from an object
+
 ## [2.0.2] - 2022-08-28
 
 ### Changed

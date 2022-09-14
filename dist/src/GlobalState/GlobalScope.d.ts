@@ -6,4 +6,5 @@ interface GlobalScopeInf {
 }
 export declare const GlobalScope: GlobalScopeInf;
 export declare const isGlobalScope: (value: any) => value is GlobalScope<any>;
+export declare const hydrateGlobalScope: (scope: GlobalScope<any>, obj: Record<string, any>) => void;
 export {};
