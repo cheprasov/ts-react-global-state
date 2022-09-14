@@ -1,4 +1,4 @@
-import { isGlobalScope, GlobalScope } from './GlobalScope';
+import { isGlobalScope, GlobalScope, hydrateGlobalScope } from './GlobalScope';
 
 describe('GlobalScope', () => {
     it('should create a new instance of GlobalScope', () => {
@@ -9,7 +9,6 @@ describe('GlobalScope', () => {
         expect(isGlobalScope(scope)).toEqual(true);
         expect(scope).not.toBe(obj);
     });
-
 
     it('should allow to access all passed props', () => {
         const obj = {
@@ -67,3 +66,66 @@ describe('isGlobalScope', () => {
         expect(isGlobalScope([])).toEqual(false);
     });
 });
+
+describe('hydrateGlobalScope', () => {
+    it('should fill instance values from an object', () => {
+        const obj = {
+            foo: '',
+            bar: 0,
+            user: null,
+            count: 10,
+        };
+        const scope = new GlobalScope(obj);
+        const data = {
+            foo: 'foo42',
+            bar: 42,
+            user: { name: 'Alex' },
+        };
+        hydrateGlobalScope(scope, data);
+
+        expect(scope.foo).toEqual(data.foo);
+        expect(scope.bar).toEqual(data.bar);
+        expect(scope.user).toBe(data.user);
+        expect(scope.count).toBe(obj.count);
+    });
+
+    it('should fill nested Global Scoped values from an object', () => {
+        const obj = {
+            foo: '',
+            bar: 0,
+            user: new GlobalScope({
+                name: '',
+                age: 0,
+                hobby: new GlobalScope({
+                    it: '',
+                    humor: '',
+                    laziness: ''
+                }),
+            }),
+        };
+        const scope = new GlobalScope(obj);
+        const data = {
+            foo: 'foo42',
+            user: {
+                name: 'Alex',
+                age: 37,
+                hobby: {
+                    it: 'expert',
+                    humor: 'advanced',
+                    laziness: 'master',
+                },
+            },
+        };
+        hydrateGlobalScope(scope, data);
+
+        expect(scope.foo).toEqual(data.foo);
+        expect(scope.bar).toEqual(obj.bar);
+        expect(scope.user).not.toBe(data.user);
+        expect(scope.user.hobby).not.toBe(data.user.hobby);
+        expect(scope.user.name).toEqual(data.user.name);
+        expect(scope.user.age).toEqual(data.user.age);
+        expect(scope.user.hobby.it).toEqual(data.user.hobby.it);
+        expect(scope.user.hobby.humor).toEqual(data.user.hobby.humor);
+        expect(scope.user.hobby.laziness).toEqual(data.user.hobby.laziness);
+    });
+})
