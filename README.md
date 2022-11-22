@@ -61,7 +61,7 @@ root.render(
 import { useGlobalState } from '@cheprasov/react-global-state';
 
 const Counter: React.FC = () => {
-    const  [ count, setCount ] = useGlobalScope<number>('count'); // like useState
+    const  [ count, setCount ] = useGlobalState<number>('count'); // like useState
 
     const increaseCount = () => {
         // `set function` has the same API like a `set function` from React.useState()
