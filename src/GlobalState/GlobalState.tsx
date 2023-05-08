@@ -2,8 +2,8 @@ import React, {
     useContext,
     Context,
     useState,
-    createElement,
     useReducer,
+    createElement,
 } from 'react';
 import { stringify } from '../string/stringify';
 import { Tree } from '@cheprasov/data-structures';
@@ -18,6 +18,9 @@ import type { ReducerTupleExtendedType, StateTupleExtendedType, ReducerTupleType
 export interface ScopeVariablesInf {
     [key: string]: StateTupleExtendedType<any> | ReducerTupleExtendedType<any, any> | ScopeVariablesInf;
 }
+
+export type ContextByNameType = Map<string, Context<any>>;
+export const GlobalScopeContextByName = React.createContext<ContextByNameType>(new Map());
 
 export const createStateDefiner = (obj: Record<string, any>) => {
     const body: string[] = [`var n = {};`];
@@ -37,17 +40,15 @@ export const createStateDefiner = (obj: Record<string, any>) => {
     );
 }
 
-export const contextByStateName = new Map<string, Context<any>>();
-
-export const createGlobalState = <S,>(name: string, initialState: S | (() => S)) => {
-    if (contextByStateName.has(name)) {
+export const createGlobalState = <S,>(name: string, initialState: S | (() => S), contextByName: ContextByNameType) => {
+    if (contextByName.has(name)) {
         throw new Error(`Global State '${name}' already exists`)
     }
 
     const init = isFunction(initialState) ? initialState() : initialState;
 
     const Context = React.createContext<StateTupleType<S>>([init, () => {}]);
-    contextByStateName.set(name, Context);
+    contextByName.set(name, Context);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const state = useState(initialState);
@@ -67,29 +68,29 @@ export const createGlobalState = <S,>(name: string, initialState: S | (() => S))
 };
 
 export const useGlobalState = <T,>(name: string): StateTupleExtendedType<T> => {
-    const Context = contextByStateName.get(name) as Context<StateTupleExtendedType<T>> | undefined;
+    const contextByName = useContext(GlobalScopeContextByName);
+    const Context = contextByName.get(name) as Context<StateTupleExtendedType<T>> | undefined;
     if (!Context) {
         throw new Error(`Global State '${name}' is not exist`);
     }
     return useContext(Context);
 };
 
-export const contextByReducerName = new Map<string, Context<any>>();
-
 export const createGlobalReducer = (
     name: string,
     reducer: React.Reducer<any, any>,
     initialState: any,
-    initializer?: (init: any) => any,
+    initializer: ((init: any) => any) = () => {},
+    contextByName: ContextByNameType
 ) => {
-    if (contextByReducerName.has(name)) {
+    if (contextByName.has(name)) {
         throw new Error(`Global Reducer '${name}' already exists`)
     }
 
     const init = isFunction(initializer) ? initializer(initialState) : initialState;
 
     const Context = React.createContext<ReducerTupleType<any, any>>([init, () => {}]);
-    contextByReducerName.set(name, Context);
+    contextByName.set(name, Context);
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         const stateTuple = useReducer(reducer, initialState);
@@ -110,22 +111,22 @@ export const createGlobalReducer = (
 };
 
 export const useGlobalReducer = <T,D>(name: string): ReducerTupleExtendedType<T, D> => {
-    const Context = contextByReducerName.get(name) as Context<ReducerTupleExtendedType<T, D>> | undefined;
+    const contextByName = useContext(GlobalScopeContextByName);
+    const Context = contextByName.get(name) as Context<ReducerTupleExtendedType<T, D>> | undefined;
     if (!Context) {
         throw new Error(`Global Reducer '${name}' is not exist`);
     }
     return useContext(Context);
 };
 
-export const contextByScopeName = new Map<string, Context<any>>();
-
 export const createGlobalScope = (
     name: string,
     scope: Record<string, StateValueType<any>>,
     useScope: Record<string, string> = {},
     useReducer: Record<string, string> = {},
+    contextByName: ContextByNameType
 ) => {
-    if (contextByScopeName.has(name)) {
+    if (contextByName.has(name)) {
         throw new Error(`Global Scope '${name}' already exists`)
     }
 
@@ -149,7 +150,7 @@ export const createGlobalScope = (
     });
 
     const Context = React.createContext(initScope);
-    contextByScopeName.set(name, Context);
+    contextByName.set(name, Context);
 
     const stateDefiner = createStateDefiner(scopeCopy);
 
@@ -188,7 +189,7 @@ const isNode = (node: any): node is Node => {
     return node.$$__nodeType === 'scope' || node.$$__nodeType === 'reducer';
 }
 
-export const createMultiGlobalScopes = (scopes: MultiScope) => {
+export const createMultiGlobalScopes = (scopes: MultiScope, contextByName: ContextByNameType) => {
     const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | Node, any[]>(
         scopes,
         (node) => {
@@ -249,20 +250,22 @@ export const createMultiGlobalScopes = (scopes: MultiScope) => {
 
     const globalScopes = linerScopes.reverse().map((scopeNode: Node) => {
         if (scopeNode.$$__nodeType === 'scope') {
-            return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer);
+            return createGlobalScope(scopeNode.name, scopeNode.data, scopeNode.useScopes, scopeNode.useReducer, contextByName);
         }
         if (scopeNode.$$__nodeType === 'reducer' && isGlobalReducer(scopeNode.data)) {
             const globalReducer = scopeNode.data as GlobalReducer<any>;
-            return createGlobalReducer(scopeNode.name, globalReducer.reducer, globalReducer.initialState, globalReducer.initializer);
+            return createGlobalReducer(scopeNode.name, globalReducer.reducer, globalReducer.initialState, globalReducer.initializer, contextByName);
         }
         return ({ children }: any) => children;
     });
 
     const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         return (
-            <ComponentWrapper components={globalScopes}>
-                {children}
-            </ComponentWrapper>
+            <GlobalScopeContextByName.Provider value={contextByName}>
+                <ComponentWrapper components={globalScopes}>
+                    {children}
+                </ComponentWrapper>
+            </GlobalScopeContextByName.Provider>
         );
     };
 
@@ -283,7 +286,8 @@ type GetObjectKeys<T> = {
 // };
 
 export const useGlobalScope = <T extends Record<string, any>>(name: string): Scope<T> => {
-    const Context = contextByScopeName.get(name) as Context<T & Scope<T>> | undefined;
+    const contextByName = useContext(GlobalScopeContextByName);
+    const Context = contextByName.get(name) as Context<T & Scope<T>> | undefined;
     if (!Context) {
         throw new Error(`Global Scope '${name}' is not exist`)
     }

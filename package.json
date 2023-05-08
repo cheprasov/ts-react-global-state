@@ -1,6 +1,6 @@
 {
     "name": "@cheprasov/react-global-state",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "author": "Alexander Cheprasov",
     "description": "The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.",
     "keywords": [
