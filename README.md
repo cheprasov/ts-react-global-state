@@ -24,7 +24,7 @@ import {
     createGlobalState, useGlobalState,
     createGlobalReducer, useGlobalReducer,
     createGlobalScope, useGlobalScope,
-    createMultiGlobalScopes, withGlobalScope,
+    createGlobalStates, withGlobalScope,
 } from '@cheprasov/react-global-state';
 ```
 
@@ -289,7 +289,7 @@ const nestedScopes = {
     }),
 };
 
-const GlobalScopes = createMultiGlobalScopes(nestedScopes);
+const GlobalScopes = createGlobalStates(nestedScopes);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -630,9 +630,9 @@ export const UserClassWithGlobalScope = withGlobalScope(
 
 #### 3.3.4. Creating Nested Global Scopes
 ```typescript
-createMultiGlobalScopes(scopes: Object) // Returns React.memo(React.FunctionalComponent)
+createGlobalStates(scopes: Object) // Returns React.memo(React.FunctionalComponent)
 ```
-Please note, the `createMultiGlobalScopes` should be called once and outside a component implementation.
+Please note, the `createGlobalStates` should be called once and outside a component implementation.
 
 **Params:**
  - scopes: `Object` - An object that will be used for creating key/values for scopes. The original object will be never changed. Allowed to have nested scopes.
@@ -680,7 +680,7 @@ const nestedScope = {
   }),
 };
 
-const GlobalScope = createMultiGlobalScopes(nestedScope);
+const GlobalScope = createGlobalStates(nestedScope);
 
 root.render(
     <GlobalScope>
@@ -774,7 +774,7 @@ const nestedScope = {
   }),
 };
 
-const GlobalScope = createMultiGlobalScopes(nestedScope);
+const GlobalScope = createGlobalStates(nestedScope);
 
 root.render(
     <GlobalScope>

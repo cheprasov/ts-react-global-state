@@ -1,10 +1,6 @@
 export {
-    createGlobalState,
-    useGlobalState,
-    createGlobalReducer,
     useGlobalReducer,
-    createGlobalScope,
-    createMultiGlobalScopes,
+    createGlobalStates,
     useGlobalScope,
     withGlobalScope,
 } from './GlobalState/GlobalState';

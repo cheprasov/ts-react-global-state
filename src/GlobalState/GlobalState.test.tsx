@@ -6,7 +6,7 @@ import {
     createGlobalReducer,
     createGlobalScope,
     createGlobalState,
-    createMultiGlobalScopes,
+    createGlobalStates,
     createStateDefiner,
     useGlobalReducer,
     useGlobalScope,
@@ -631,13 +631,13 @@ return n;
         });
     });
 
-    describe('createMultiGlobalScopes', () => {
+    describe('createGlobalStates', () => {
         beforeEach(() => {
             contextByScopeName.clear();
         });
 
         it('should create several global states', () => {
-            const GlobalStates = createMultiGlobalScopes({
+            const GlobalStates = createGlobalStates({
                 foo: new GlobalScope({ value: 42 }),
                 bar: new GlobalScope({ value: 10 }),
                 baz: new GlobalScope({ value: 33 }),
@@ -649,7 +649,7 @@ return n;
         });
 
         it('should create global states only for scoped objects', () => {
-            const GlobalStates = createMultiGlobalScopes({
+            const GlobalStates = createGlobalStates({
                 foo: { value: 42 },
                 bar: { value: 10 },
                 baz: new GlobalScope({ value: 33 }),
@@ -661,7 +661,7 @@ return n;
         });
 
         it('should create nested scope', () => {
-            const GlobalStates = createMultiGlobalScopes({
+            const GlobalStates = createGlobalStates({
                 foo: new GlobalScope({
                     value: 42,
                     bar: new GlobalScope({
@@ -715,7 +715,7 @@ return n;
                     }),
                 }),
             };
-            const GlobalStates = createMultiGlobalScopes(initState);
+            const GlobalStates = createGlobalStates(initState);
 
             const testFunction = jest.fn();
 
