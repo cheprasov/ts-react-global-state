@@ -1,6 +1,6 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v2.1.0)
+@cheprasov/react-global-state (v3.0.0)
 =========
 
 The library allows to manage global state and nested global states easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
@@ -61,7 +61,7 @@ root.render(
 import { useGlobalState } from '@cheprasov/react-global-state';
 
 const Counter: React.FC = () => {
-    const  [ count, setCount ] = useGlobalScope<number>('count'); // like useState
+    const  [ count, setCount ] = useGlobalState<number>('count'); // like useState
 
     const increaseCount = () => {
         // `set function` has the same API like a `set function` from React.useState()
