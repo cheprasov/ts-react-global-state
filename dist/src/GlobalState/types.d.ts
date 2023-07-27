@@ -1,24 +1,16 @@
-import type { Dispatch, SetStateAction } from 'react';
-export declare type StateValueType<T> = T | (() => T);
-export declare type SetStateType<T> = Dispatch<SetStateAction<T>>;
-export declare type StateTupleType<T> = [T, SetStateType<T>];
-export declare type ScopeStatesType<T> = {
-    [P in keyof T]: [T[P], SetStateType<T[P]>];
+import type { Context, Dispatch, SetStateAction } from 'react';
+import { Scope } from './Scope';
+export declare type TStateValue<T> = T | (() => T);
+export declare type TSetState<T> = Dispatch<SetStateAction<T>>;
+export declare type TStateTuple<T> = [T, TSetState<T>];
+export declare type TScopeStates<T> = {
+    [P in keyof T]: [T[P], TSetState<T[P]>];
 };
-export declare type ReducerTupleType<T, D> = [T, React.Dispatch<D>];
-export declare type OpenPropsType<T extends Record<string, any>> = {
-    [P in keyof T]: T[P];
+export declare type TStateTupleExtended<T> = TStateTuple<T> & {
+    value: T;
+    setValue: TSetState<T>;
 };
-export declare type StateTupleExtendedType<T> = StateTupleType<T> & {
-    globalState: true;
-    stateValue: T;
-    setStateValue: SetStateType<T>;
-};
-export declare const isStateTupleExtendedType: <T>(value: any) => value is StateTupleExtendedType<T>;
-export declare type ReducerTupleExtendedType<T, D> = ReducerTupleType<T, D> & {
-    globalReducer: true;
-    stateValue: T;
-    setStateValue: React.Dispatch<D>;
-    dispatchStateValue: React.Dispatch<D>;
-};
-export declare const isReducerTupleExtendedType: <T, D>(value: any) => value is ReducerTupleExtendedType<T, D>;
+export declare type TContextByScopeOrName = Map<Scope | string, Context<any>>;
+export interface IScopeVariables {
+    [key: string]: TStateTupleExtended<any> | IScopeVariables;
+}

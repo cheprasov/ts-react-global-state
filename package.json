@@ -24,11 +24,11 @@
     "peerDependencies": {
         "@types/react": "^18.0.8",
         "@types/react-dom": "^18.0.0",
-        "react": "^18.1.0",
-        "react-dom": "^18.1.0"
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "dependencies": {
-        "@cheprasov/data-structures": "^0.2.0"
+        "@cheprasov/data-structures": "github:cheprasov/ts-data-structures#v0.4.0"
     },
     "devDependencies": {
         "@testing-library/react": "^13.1.1",

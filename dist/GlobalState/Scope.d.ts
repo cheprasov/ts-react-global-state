@@ -1,18 +1,17 @@
-import { GlobalReducer } from './GlobalReducer';
-import { GlobalScope } from './GlobalScope';
-import { ReducerTupleExtendedType, StateTupleExtendedType } from './types';
-export declare type Scope<T> = T extends GlobalReducer<any> ? (ReducerTupleExtendedType<T['initialState'], T['reducer']>) : (T extends Array<any> ? StateTupleExtendedType<T> : (T extends GlobalScope<any> ? {
-    [P in keyof T]: Scope<T[P]>;
-} & ScopeMethods : ([
-    T
-] extends [boolean] ? StateTupleExtendedType<boolean> : StateTupleExtendedType<T>)));
-interface ScopeMethods {
+export interface IScopeData {
+    [key: string]: any | Scope;
+}
+export declare class Scope {
+    protected _data: IScopeData;
+    protected _reactContext: any;
+    constructor(scope: IScopeData);
+    _getData(): IScopeData;
+    setReactContext(context: any): void;
+    getReactContext(): any;
+    getChildrenScopes(): Record<string, Scope>;
+    setValue(key: string, value: any): void;
     toObject(): Record<string, any>;
-    fromObject(obj: any): void;
+    fromObject(obj: Record<string, any>): void;
+    addScopeUpdateListener(listener: Function, options: {}): void;
+    removeScopeUpdateListener(listener: Function): void;
 }
-interface ScopeInf {
-    new <T>(data: T): Scope<T>;
-}
-export declare const Scope: ScopeInf;
-export declare const isScopeInstance: <T>(value: any) => value is Scope<T> & ScopeMethods;
-export {};

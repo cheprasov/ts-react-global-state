@@ -1,87 +1,52 @@
-import { GlobalReducer } from './GlobalReducer';
-import { GlobalScope } from './GlobalScope';
-import { isReducerTupleExtendedType, isStateTupleExtendedType, ReducerTupleExtendedType, SetStateType, StateTupleExtendedType } from './types';
+import { ObjectHelper } from '@cheprasov/data-structures';
 
-export type Scope<T> =
-    T extends GlobalReducer<any>
-    ? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
-    : (
-        T extends Array<any>
-        ? StateTupleExtendedType<T>
-        : (
-            T extends GlobalScope<any>
-            ? {
-                [P in keyof T]: Scope<T[P]>
-            } & ScopeMethods
-            :  (
-                [T] extends [boolean]
-                ? StateTupleExtendedType<boolean>
-                : StateTupleExtendedType<T>
-            )
-        )
-    );
-
-interface ScopeMethods {
-    toObject(): Record<string, any>;
-    fromObject(obj: any): void;
+export interface IScopeData {
+    [key: string]: any | Scope;
 }
 
-interface ScopeInf {
-    new <T>(data: T): Scope<T>;
-}
+export class Scope {
 
-export const Scope = class <T extends {}> {
+    protected _data: IScopeData;
+    protected _reactContext: any;
 
-    constructor(data: T) {
-        Object.assign(this, data)
+    constructor(scope: IScopeData) {
+        this._data = scope;
     }
 
-    toObject(this: T): Record<string, any> {
-        const result: Record<string, any> = {};
-
-        for (let key in this) {
-            if (!this.hasOwnProperty(key)) {
-                continue;
-            }
-            const value = this[key];
-            if (isScopeInstance(value)) {
-                result[key] = value.toObject();
-            } else if (isReducerTupleExtendedType<any, any>(value)) {
-                result[key] = 'toObject' in value.stateValue ? value.stateValue.toObject() : value.stateValue;
-            } else if (isStateTupleExtendedType(value)) {
-                result[key] = value.stateValue; // state & reducer
-            }
-        }
-
-        return result;
+    _getData() {
+        return this._data;
     }
 
-    fromObject(this: T, obj: Record<string, any>): void {
-        if (typeof obj !== 'object' || !obj) {
-            return;
-        }
-        for (let key in this) {
-            if (!this.hasOwnProperty(key)) {
-                continue;
-            }
-            if (!(key in obj)) {
-                continue;
-            }
-            const objValue = obj[key];
-            const value = this[key];
-
-            if (isScopeInstance(value)) {
-                value.fromObject(objValue);
-            } else if (isReducerTupleExtendedType<any, any>(value)) {
-               value.dispatchStateValue({ type: 'init', init: objValue });
-            } else if (isStateTupleExtendedType<typeof value>(value)) {
-                value.setStateValue(objValue);
-            }
-        }
+    setReactContext(context: any) {
+        this._reactContext = context;
     }
 
-} as ScopeInf;
+    getReactContext(): any {
+        return this._reactContext;
+    }
 
-export const isScopeInstance = <T>(value: any): value is Scope<T> & ScopeMethods => {
-    return value instanceof Scope;
+    getChildrenScopes(): Record<string, Scope> {
+        return ObjectHelper.filter(this._data, (value) => {
+            if (value instanceof Scope) {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    setValue(key: string, value: any) {
+    }
+
+    toObject(): Record<string, any> {
+        return {};
+    }
+
+    fromObject(obj: Record<string, any>) {
+    }
+
+    addScopeUpdateListener(listener: Function, options: {}) {
+    }
+
+    removeScopeUpdateListener(listener: Function) {
+    }
 }
