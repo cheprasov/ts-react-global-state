@@ -40,43 +40,7 @@ export const createStateDefiner = (obj: Record<string, any>) => {
     );
 }
 
-export const createGlobalState = <S,>(name: string, initialState: S | (() => S), contextByName: ContextByNameType) => {
-    if (contextByName.has(name)) {
-        throw new Error(`Global State '${name}' already exists`)
-    }
-
-    const init = isFunction(initialState) ? initialState() : initialState;
-
-    const Context = React.createContext<StateTupleType<S>>([init, () => {}]);
-    contextByName.set(name, Context);
-
-    const ContextNode: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-        const state = useState(initialState);
-        type StateTuple = StateTupleExtendedType<typeof state[0]>;
-        (state as StateTuple).globalState = true;
-        (state as StateTuple).stateValue = state[0];
-        (state as StateTuple).setStateValue = state[1];
-
-        return (
-            <Context.Provider value={state}>
-                {children}
-            </Context.Provider>
-        );
-    };
-
-    return React.memo(ContextNode);
-};
-
-export const useGlobalState = <T,>(name: string): StateTupleExtendedType<T> => {
-    const contextByName = useContext(GlobalScopeContextByName);
-    const Context = contextByName.get(name) as Context<StateTupleExtendedType<T>> | undefined;
-    if (!Context) {
-        throw new Error(`Global State '${name}' is not exist`);
-    }
-    return useContext(Context);
-};
-
-export const createGlobalReducer = (
+const createGlobalReducer = (
     name: string,
     reducer: React.Reducer<any, any>,
     initialState: any,
@@ -119,7 +83,7 @@ export const useGlobalReducer = <T,D>(name: string): ReducerTupleExtendedType<T,
     return useContext(Context);
 };
 
-export const createGlobalScope = (
+const createGlobalScope = (
     name: string,
     scope: Record<string, StateValueType<any>>,
     useScope: Record<string, string> = {},
@@ -189,7 +153,7 @@ const isNode = (node: any): node is Node => {
     return node.$$__nodeType === 'scope' || node.$$__nodeType === 'reducer';
 }
 
-export const createMultiGlobalScopes = (scopes: MultiScope, contextByName: ContextByNameType) => {
+export const createGlobalStates = (scopes: MultiScope, contextByName: ContextByNameType) => {
     const linerScopes = Tree.levelOrderTreeTraversal<MultiScope | Node, any[]>(
         scopes,
         (node) => {
