@@ -40,17 +40,17 @@ export class Scope {
         return this._childrenScopesByKey;
     }
 
-    setValue(key: string, value: any) {
+    setValue<T>(key: string, value: TSetState<T>) {
         if (!(key in this._data)) {
             throw new Error(`Key '${key}' not found in Scope`);
         }
         if (key in this._childrenScopesByKey) {
-            return this._childrenScopesByKey[key].fromObject(value);
+            return this._childrenScopesByKey[key].updateByObject(value);
         }
         if (this._settersByKey) {
             this._settersByKey[key](value);
         } else {
-            this._data[key] = value;
+            this._data[key] = typeof value === 'function' ? value(this._data[key]) : value;
         }
     }
 
@@ -68,8 +68,9 @@ export class Scope {
         return {};
     }
 
-    fromObject(obj: Record<string, any>): boolean {
-        let isUpdated = false;
+    updateByObject(obj: Record<string, any>) {
+        const isUpdateByReactContext = obj.$$__GlobalScope_updater === 'react-context';
+        delete obj.$$__gs_updater;
         if (typeof obj !== 'object' || !obj) {
             return false;
         }
@@ -84,16 +85,18 @@ export class Scope {
             const currentValue = this._data[key];
 
             if (currentValue instanceof Scope) {
-                isUpdated = isUpdated || currentValue.fromObject(newValue);
+                currentValue.updateByObject(newValue);
             } else if (newValue !== currentValue) {
+                this.setValue(key, newValue);
                 this._data[key] = newValue;
-                isUpdated = true;
             }
         }
-        new Promise(() => {
-            this._observer.publish({...this._data});
-        })
-        return isUpdated;
+        if (isUpdateByReactContext) {
+            (async () => {
+                console.log('PUBLISH', {...this._data});
+                this._observer.publish({...this._data});
+            })();
+        }
     }
 
     addScopeUpdatesListener(listener: Observer.ListenerCallback<IScopeData>) {

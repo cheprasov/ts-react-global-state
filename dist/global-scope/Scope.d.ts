@@ -14,10 +14,10 @@ export declare class Scope {
     _getObserver(): Observer.Observer<IScopeData>;
     _setSettersByKey(setters: TSettersByKey): void;
     getChildrenScopesByKey(): Record<string, Scope>;
-    setValue(key: string, value: any): boolean | undefined;
+    setValue<T>(key: string, value: TSetState<T>): false | undefined;
     getValue(key: string): any;
     toObject(): Record<string, any>;
-    fromObject(obj: Record<string, any>): boolean;
+    updateByObject(obj: Record<string, any>): false | undefined;
     addScopeUpdatesListener(listener: Observer.ListenerCallback<IScopeData>): void;
     removeScopeUpdatesListener(listener: Function): void;
 }

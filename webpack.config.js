@@ -39,6 +39,7 @@ const libConfig = {
 
 const demoConfig = {
     target: 'node',
+    devtool: 'source-map',
     entry: {
         'GlobalScope': './demo/GlobalScope/index.tsx',
     },

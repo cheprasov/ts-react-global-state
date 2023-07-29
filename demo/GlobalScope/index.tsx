@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { Scope } from '../../src/global-scope/Scope';
 import { createGlobalScope } from '../../src/global-scope/createGlobalScope';
+import { ScopeVariablesWrapper } from '../../src/global-scope/ScopeVariablesWrapper';
 
 const scope = new Scope({
     app: new Scope({
@@ -66,6 +67,12 @@ const scope = new Scope({
 scope.addScopeUpdatesListener((values) => {
     console.log('ScopeUpdateListener', values);
 });
+
+const s = new ScopeVariablesWrapper({
+    test: [42, () => 33],
+});
+
+console.log('ScopeVariablesWrapper', s['test']);
 
 setTimeout(() => {
     console.log('AGE', scope.getValue('app').getValue('user').getValue('age'));

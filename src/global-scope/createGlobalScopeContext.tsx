@@ -51,6 +51,9 @@ export const createGlobalScopeContext = (
         });
 
         const depValues = depKeys.map((key) => {
+            if (scopeValueByKey[key] instanceof ScopeVariablesWrapper) {
+                return scopeValueByKey[key];
+            }
             return scopeValueByKey[key].value;
         });
 
@@ -65,8 +68,12 @@ export const createGlobalScopeContext = (
         }, []);
 
         useEffectNoInit(() => {
-            console.log('scopeWrapper object', scopeWrapper, scopeWrapper.toObject());
-            scope.fromObject(scopeWrapper.toObject());
+            const updateByReactContext = {
+                ...scopeWrapper.toObject(),
+                $$__GlobalScope_updater: 'react-context',
+            };
+            console.log('scopeWrapper object', scopeWrapper, updateByReactContext);
+            scope.updateByObject(updateByReactContext);
         }, depValues);
 
         return (
