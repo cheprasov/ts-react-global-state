@@ -3,8 +3,8 @@ export {
     createGlobalStates,
     useGlobalScope,
     withGlobalScope,
-} from './GlobalState/GlobalState';
+} from './global-scope/GlobalState';
 
-export { Scope } from './GlobalState/Scope';
-export { GlobalScope, hydrateGlobalScope } from './GlobalState/createGlobalScope';
-export { GlobalReducer } from './GlobalState/GlobalReducer';
+export { Scope } from './global-scope/Scope';
+export { GlobalScope, hydrateGlobalScope } from './global-scope/createGlobalScope';
+export { GlobalReducer } from './global-scope/GlobalReducer';

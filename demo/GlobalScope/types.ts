@@ -1,5 +1,5 @@
-import { GlobalReducer } from '../../src/GlobalState/GlobalReducer';
-import { GlobalScope } from '../../src/GlobalState/createGlobalScope';
+import { GlobalReducer } from '../../src/global-scope/GlobalReducer';
+import { GlobalScope } from '../../src/global-scope/createGlobalScope';
 
 export interface AppNestedScopeInf {
     app: GlobalScope<{

@@ -1,11 +1,10 @@
-import { ObjectHelper, Tree } from '@cheprasov/data-structures';
+import { Nullable, Object, Tree } from '@cheprasov/data-structures';
 import { Scope } from './Scope';
-import { Nullable } from '@cheprasov/data-structures/dist/types/Nullable';
 import React from 'react';
 import { TContextByScopeOrName } from './types';
 import { createGlobalScopeContext } from './createGlobalScopeContext';
 import { GlobalScopeWrapper } from './GlobalScopeWrapper';
-import ComponentWrapper from '../ComponentsWrapper/ComponentWrapper';
+import ComponentWrapper from '../components/ComponentWrapper';
 
 export type TScopeByKey = Map<string, Scope>;
 
@@ -22,8 +21,9 @@ export const createGlobalScope = (scope: Scope) => {
     const scopeNodes = Tree.levelOrderTreeTraversal<IScopeNode, IScopeNode[]>(
         { key: '', scope, parent: null, type: 'scope' },
         (node) => {
-            return ObjectHelper.reduce<IScopeNode[], Scope, Record<string, Scope>>(node.scope.getChildrenScopes(), (res, scope, key) => {
-                res.push({ key, scope, parent: node.scope, type: 'scope' });
+            const keyPrefix = node.key ? `${node.key}.` : '';
+            return Object.Helper.reduce<IScopeNode[], Scope, Record<string, Scope>>(node.scope.getChildrenScopesByKey(), (res, scope, key) => {
+                res.push({ key: `${keyPrefix}${key}`, scope, parent: node.scope, type: 'scope' });
                 return res;
             }, []);
         },

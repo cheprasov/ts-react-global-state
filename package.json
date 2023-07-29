@@ -28,7 +28,7 @@
         "react-dom": "^18.2.0"
     },
     "dependencies": {
-        "@cheprasov/data-structures": "github:cheprasov/ts-data-structures#v0.4.0"
+        "@cheprasov/data-structures": "github:cheprasov/ts-data-structures#master"
     },
     "devDependencies": {
         "@testing-library/react": "^13.1.1",

@@ -1,7 +1,7 @@
 import { Context, useContext } from 'react';
 import { Scope } from './Scope';
 import { GlobalScopeWrapper } from './GlobalScopeWrapper';
-import { TScopeValues } from './ScopeWrapper';
+import { TScopeValues } from './ScopeVariablesWrapper';
 
 export const useGlobalScope = <T extends Record<string, any>>(scope: string | Scope): TScopeValues<T> => {
     const wrapperData = useContext(GlobalScopeWrapper);

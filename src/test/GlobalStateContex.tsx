@@ -3,7 +3,7 @@
 // import Observer from '../../../common/observer/Observer';
 // import { Nullable } from '../../../common/types/Nullable';
 // import { useEffectNoInit } from '../hooks/useEffectNoInit';
-// import { ObjectHelper } from '@cheprasov/data-structures';
+// import { Object } from '@cheprasov/data-structures';
 
 // export type TStateTuple<T> = [T, Nullable<(value: T) => void>];
 
@@ -27,7 +27,7 @@
 //     }
 
 //     init () {
-//         ObjectHelper.forEach(this.initStates, (value, key) => {
+//         Object.Helper.forEach(this.initStates, (value, key) => {
 //             this.getUseState(key, value);
 //         });
 //     }

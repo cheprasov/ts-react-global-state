@@ -3,7 +3,7 @@ import Search from './components/Search';
 import Settings from './components/Settings';
 import User from './components/User';
 import { AppNestedScopeInf } from './types';
-import { useGlobalScope } from '../../src/GlobalState/useGlobalScope';
+import { useGlobalScope } from '../../src/global-scope/useGlobalScope';
 
 function App() {
   const appScope = useGlobalScope('app') as any;
@@ -14,7 +14,6 @@ function App() {
   //console.log(appScope.counter.value);
 
   useEffect(() => {
-    console.log('setTimeout');
     setTimeout(() => {
       const r = Math.random().toString(36);
       appScope.search.filters.rating.setValue(r as any);
@@ -27,7 +26,7 @@ function App() {
       console.log('increment');
       // @ts-ignore
       //appScope.counter.dispatchStateValue({ type: 'increment' });
-    }, 2000);
+    }, 5000000);
 
     setTimeout(() => {
       const r = Math.random().toString(36);
