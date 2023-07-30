@@ -1,14 +1,13 @@
-import { Scope } from "./Scope";
-import { IScopeVariables, TStateTupleExtended } from "./types";
-export declare type TScopeValues<T> = T extends Array<any> ? TStateTupleExtended<T> : T extends Scope ? {
+import { IScopeVariables, TScope, TStateTupleExtended } from "./types";
+export declare type TScopeValues<T> = T extends TScope<any> ? {
     [P in keyof T]: TScopeValues<T[P]>;
-} & ScopeMethods : [T] extends [boolean] ? TStateTupleExtended<boolean> : TStateTupleExtended<T>;
-interface ScopeMethods {
+} & IScopeMethods : [T] extends [boolean] ? TStateTupleExtended<boolean> : TStateTupleExtended<T>;
+interface IScopeMethods {
     toObject(): Record<string, any>;
 }
 interface IScopeTuplesWrapper {
-    new <T>(data: T): IScopeVariables & ScopeMethods;
+    new <T>(data: T): IScopeVariables & IScopeMethods;
 }
 export declare const ScopeVariablesWrapper: IScopeTuplesWrapper;
-export declare const isScopeWrapperInstance: <T>(value: any) => value is TScopeValues<T> & ScopeMethods;
+export declare const isScopeWrapperInstance: <T>(value: any) => value is TScopeValues<T> & IScopeMethods;
 export {};

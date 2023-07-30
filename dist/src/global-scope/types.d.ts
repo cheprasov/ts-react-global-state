@@ -15,3 +15,6 @@ export declare type TContextByScopeOrName = Map<Scope | string, Context<any>>;
 export interface IScopeVariables {
     [key: string]: TStateTupleExtended<any> | IScopeVariables;
 }
+export declare type TScope<T> = {
+    [P in keyof T]: T[P];
+};

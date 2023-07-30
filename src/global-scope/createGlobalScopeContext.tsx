@@ -5,7 +5,6 @@ import { createStateDefiner } from './createStateDefiner';
 import { useGlobalScope } from './useGlobalScope';
 import { useEffectNoInit } from '../hooks/useEffectNoInit';
 import { ScopeVariablesWrapper } from './ScopeVariablesWrapper';
-import { Object as O } from '@cheprasov/data-structures';
 
 interface ISubScope {
     scope: Scope;
@@ -72,7 +71,6 @@ export const createGlobalScopeContext = (
                 ...scopeWrapper.toObject(),
                 $$__GlobalScope_updater: 'react-context',
             };
-            console.log('scopeWrapper object', scopeWrapper, updateByReactContext);
             scope.updateByObject(updateByReactContext);
         }, depValues);
 

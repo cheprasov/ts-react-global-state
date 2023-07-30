@@ -1,5 +1,5 @@
 import { Nullable, Object, Observer } from '@cheprasov/data-structures';
-import { IScopeVariables, TSetState } from './types';
+import { TSetState } from './types';
 
 export interface IScopeData {
     [key: string]: any | Scope;
@@ -58,14 +58,24 @@ export class Scope {
         if (!(key in this._data)) {
             throw new Error(`Key '${key}' not found in Scope`);
         }
-        // if (key in this._childrenScopesByKey) {
-        //     return this._childrenScopesByKey[key].fromObject(value);
-        // }
         return this._data[key];
     }
 
     toObject(): Record<string, any> {
-        return {};
+        const result: Record<string, any> = {};
+        for (let key in this._data) {
+            if (!this._data.hasOwnProperty(key)) {
+                continue;
+            }
+            const value = this._data[key];
+            if (value instanceof Scope) {
+                result[key] = value.toObject();
+            } else {
+                result[key] = value;
+            }
+        }
+
+        return result;
     }
 
     updateByObject(obj: Record<string, any>) {
@@ -93,8 +103,8 @@ export class Scope {
         }
         if (isUpdateByReactContext) {
             (async () => {
-                console.log('PUBLISH', {...this._data});
-                this._observer.publish({...this._data});
+                console.log('PUBLISH', this);
+                this._observer.publish(this);
             })();
         }
     }

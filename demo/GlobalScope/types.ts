@@ -1,31 +1,30 @@
-import { GlobalReducer } from '../../src/global-scope/GlobalReducer';
-import { GlobalScope } from '../../src/global-scope/createGlobalScope';
+import { TScope } from '../../src/global-scope/types';
 
-export interface AppNestedScopeInf {
-    app: GlobalScope<{
-        settings: GlobalScope<{
+export type TAppScope = TScope<{
+    app: TScope<{
+        settings: TScope<{
             priceType: string; // total | perPerson
             test: boolean;
         }>;
-        counter: GlobalReducer<{
-            counter: number,
-        }>;
-        user: GlobalScope<{
+        // counter: GlobalReducer<{
+        //     counter: number,
+        // }>;
+        user: TScope<{
             name: string;
             city: string;
             age: number;
-            hobby: GlobalScope<{
+            hobby: TScope<{
                 chess: string;
                 it: string;
             }>,
         }>;
-        search: GlobalScope<{
+        search: TScope<{
             departure: string;
             destination: string;
             date: number;
             rooms: {adult: number, children?: number}[];
             nights: number,
-            filters: GlobalScope<{
+            filters: TScope<{
                 rating: number,
                 price: {
                     min: number,
@@ -34,4 +33,4 @@ export interface AppNestedScopeInf {
             }>,
         }>,
     }>,
-};
+}>;

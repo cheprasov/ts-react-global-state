@@ -65,19 +65,13 @@ const scope = new Scope({
 });
 
 scope.addScopeUpdatesListener((values) => {
-    console.log('ScopeUpdateListener', values);
+    console.log('ScopeUpdateListener', values, scope.toObject());
 });
-
-const s = new ScopeVariablesWrapper({
-    test: [42, () => 33],
-});
-
-console.log('ScopeVariablesWrapper', s['test']);
 
 setTimeout(() => {
     console.log('AGE', scope.getValue('app').getValue('user').getValue('age'));
-    scope.getValue('app').getValue('user').setValue('age', 40);
-}, 3000);
+    scope.getValue('app').getValue('user').setValue('age', (age: number) => age + 5);
+}, 5000);
 
 const GlobalScope = createGlobalScope(scope);
 

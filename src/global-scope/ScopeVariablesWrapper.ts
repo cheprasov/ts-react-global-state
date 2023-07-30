@@ -1,28 +1,51 @@
 import { Scope } from "./Scope";
-import { IScopeVariables, TStateTupleExtended } from "./types";
+import { IScopeVariables, TScope, TStateTupleExtended } from "./types";
+
+// export type TScopeValues<T> =
+// // T extends GlobalReducer<any>
+// //? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
+// //: (
+// T extends Array<any>
+// ? TStateTupleExtended<T>
+// : T extends Scope
+// ? {
+//     [P in keyof T]: TScopeValues<T[P]>;
+// } & ScopeMethods
+// : [T] extends [boolean]
+// ? TStateTupleExtended<boolean>
+// : TStateTupleExtended<T>;
+// //)
 
 export type TScopeValues<T> =
+    T extends TScope<any>
+    ? {
+      [P in keyof T]: TScopeValues<T[P]>;
+    } & IScopeMethods
+    : [T] extends [boolean]
+        ? TStateTupleExtended<boolean>
+        : TStateTupleExtended<T>;
+    ;
 // T extends GlobalReducer<any>
 //? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
 //: (
-T extends Array<any>
-? TStateTupleExtended<T>
-: T extends Scope
-? {
-    [P in keyof T]: TScopeValues<T[P]>;
-} & ScopeMethods
-: [T] extends [boolean]
-? TStateTupleExtended<boolean>
-: TStateTupleExtended<T>;
-//)
+// T extends Array<any>
+// ? TStateTupleExtended<T>
+// : T extends Scope
+// ? {
+//     [P in keyof T]: TScopeValues<T[P]>;
+// } & ScopeMethods
+// : [T] extends [boolean]
+// ? TStateTupleExtended<boolean>
+// : TStateTupleExtended<T>;
+// //)
 
-interface ScopeMethods {
+interface IScopeMethods {
     toObject(): Record<string, any>;
     //fromObject(obj: any): void;
 }
 
 interface IScopeTuplesWrapper {
-    new <T>(data: T): IScopeVariables & ScopeMethods;
+    new <T>(data: T): IScopeVariables & IScopeMethods;
 }
 
 export const ScopeVariablesWrapper = class ScopeVariablesWrapper<T extends IScopeVariables> {
@@ -48,8 +71,6 @@ export const ScopeVariablesWrapper = class ScopeVariablesWrapper<T extends IScop
     }
 } as IScopeTuplesWrapper;
 
-export const isScopeWrapperInstance = <T>(
-    value: any
-    ): value is TScopeValues<T> & ScopeMethods => {
-        return value instanceof ScopeVariablesWrapper;
-    };
+export const isScopeWrapperInstance = <T>(value: any): value is TScopeValues<T> & IScopeMethods => {
+    return value instanceof ScopeVariablesWrapper;
+};
