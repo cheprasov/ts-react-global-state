@@ -1,20 +1,4 @@
-import { Scope } from "./Scope";
 import { IScopeVariables, TScope, TStateTupleExtended } from "./types";
-
-// export type TScopeValues<T> =
-// // T extends GlobalReducer<any>
-// //? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
-// //: (
-// T extends Array<any>
-// ? TStateTupleExtended<T>
-// : T extends Scope
-// ? {
-//     [P in keyof T]: TScopeValues<T[P]>;
-// } & ScopeMethods
-// : [T] extends [boolean]
-// ? TStateTupleExtended<boolean>
-// : TStateTupleExtended<T>;
-// //)
 
 export type TScopeValues<T> =
     T extends TScope<any>
@@ -25,23 +9,9 @@ export type TScopeValues<T> =
         ? TStateTupleExtended<boolean>
         : TStateTupleExtended<T>;
     ;
-// T extends GlobalReducer<any>
-//? (ReducerTupleExtendedType<T['initialState'], T['reducer']>)
-//: (
-// T extends Array<any>
-// ? TStateTupleExtended<T>
-// : T extends Scope
-// ? {
-//     [P in keyof T]: TScopeValues<T[P]>;
-// } & ScopeMethods
-// : [T] extends [boolean]
-// ? TStateTupleExtended<boolean>
-// : TStateTupleExtended<T>;
-// //)
 
 interface IScopeMethods {
     toObject(): Record<string, any>;
-    //fromObject(obj: any): void;
 }
 
 interface IScopeTuplesWrapper {

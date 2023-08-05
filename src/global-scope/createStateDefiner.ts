@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { stringify } from '../string/stringify';
-import { Scope } from './old/Scope';
+import { Scope } from './Scope';
 import { TStateTupleExtended } from './types';
 
 export const createStateDefiner = (obj: Record<string, any>) => {

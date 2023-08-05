@@ -6,11 +6,6 @@ export type TSetStateAction<T> = SetStateAction<T>
 export type TSetState<T> = Dispatch<TSetStateAction<T>>
 export type TStateTuple<T> = [T, TSetState<T>];
 export type TScopeStates<T> = { [P in keyof T]: [T[P], TSetState<T[P]>] };
-//export type TReducerTuple<T, D> = [T, React.Dispatch<D>];
-
-// export type OpenPropsType<T extends Record<string, any>> = {
-//     [P in keyof T]: T[P]
-// };
 
 export type TStateTupleExtended<T> = TStateTuple<T> & {
     value: T;

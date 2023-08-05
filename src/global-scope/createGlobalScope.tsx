@@ -1,6 +1,6 @@
+import React from 'react';
 import { Nullable, Object, Tree } from '@cheprasov/data-structures';
 import { Scope } from './Scope';
-import React from 'react';
 import { TContextByScopeOrName } from './types';
 import { createGlobalScopeContext } from './createGlobalScopeContext';
 import { GlobalScopeWrapper } from './GlobalScopeWrapper';
