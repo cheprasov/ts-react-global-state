@@ -3,7 +3,7 @@ import { TSetState } from './types';
 export interface IScopeData {
     [key: string]: any | Scope;
 }
-declare type TSettersByKey = Record<string, TSetState<any>>;
+type TSettersByKey = Record<string, TSetState<any>>;
 export declare class Scope {
     protected _data: IScopeData;
     protected _observer: Observer.Observer<IScopeData>;

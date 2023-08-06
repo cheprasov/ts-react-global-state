@@ -1,5 +1,5 @@
 import { IScopeVariables, TScope, TStateTupleExtended } from "./types";
-export declare type TScopeValues<T> = T extends TScope<any> ? {
+export type TScopeValues<T> = T extends TScope<any> ? {
     [P in keyof T]: TScopeValues<T[P]>;
 } & IScopeMethods : [T] extends [boolean] ? TStateTupleExtended<boolean> : TStateTupleExtended<T>;
 interface IScopeMethods {

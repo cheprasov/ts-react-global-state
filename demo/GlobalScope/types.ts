@@ -1,4 +1,4 @@
-import { TScope } from '../../src/global-scope/types';
+import { TScope } from '../../src';
 
 export type TAppScope = TScope<{
     app: TScope<{

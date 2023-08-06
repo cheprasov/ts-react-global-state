@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { TAppScope } from '../types';
 import Value from './Value';
-import { useGlobalScope } from '../../../src/global-scope/useGlobalScope';
+import { useGlobalScope } from '../../../src';
 
 const departureList: string[] = [
     'Any London Airport', 'London City', 'London Gatwick',

@@ -1,5 +1,5 @@
-import { TScope } from '../../src/global-scope/types';
-export declare type TAppScope = TScope<{
+import { TScope } from '../../src';
+export type TAppScope = TScope<{
     app: TScope<{
         settings: TScope<{
             priceType: string;

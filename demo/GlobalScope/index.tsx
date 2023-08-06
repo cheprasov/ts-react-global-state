@@ -1,9 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import App from './App';
 import { Scope } from '../../src/global-scope/Scope';
-import { createGlobalScope } from '../../src/global-scope/createGlobalScope';
-import { ScopeVariablesWrapper } from '../../src/global-scope/ScopeVariablesWrapper';
+import { createGlobalScope } from '../../src';
 
 const scope = new Scope({
     app: new Scope({
@@ -71,7 +70,7 @@ scope.addScopeUpdatesListener((values) => {
 setTimeout(() => {
     console.log('AGE', scope.getValue('app').getValue('user').getValue('age'));
     scope.getValue('app').getValue('user').setValue('age', (age: number) => age + 5);
-}, 5000);
+}, 3000);
 
 const GlobalScope = createGlobalScope(scope);
 

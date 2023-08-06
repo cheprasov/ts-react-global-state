@@ -103,7 +103,6 @@ export class Scope {
         }
         if (isUpdateByReactContext) {
             (async () => {
-                console.log('PUBLISH', this);
                 this._observer.publish(this);
             })();
         }

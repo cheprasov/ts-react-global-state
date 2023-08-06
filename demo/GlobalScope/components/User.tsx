@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { TAppScope } from '../types';
 import Hobby from './Hobby';
-import { useGlobalScope } from '../../../src/global-scope/useGlobalScope';
+import { useGlobalScope } from '../../../src';
 
 const User: React.FC = () => {
     const userScope = useGlobalScope<TAppScope['app']['user']>('app.user');

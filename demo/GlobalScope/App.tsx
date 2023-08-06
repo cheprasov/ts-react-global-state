@@ -3,7 +3,7 @@ import Search from './components/Search';
 import Settings from './components/Settings';
 import User from './components/User';
 import { TAppScope } from './types';
-import { useGlobalScope } from '../../src/global-scope/useGlobalScope';
+import { useGlobalScope } from '../../src';
 
 function App() {
   const appScope = useGlobalScope<TAppScope['app']>('app');
@@ -23,13 +23,14 @@ function App() {
       appScope.user.name.setValue(r as any);
       appScope.user.city.setValue(r as any);
       appScope.user.age.setValue(r as any);
-      console.log('increment');
+      // console.log('increment');
       // @ts-ignore
       //appScope.counter.dispatchStateValue({ type: 'increment' });
     }, 5000000);
 
     setTimeout(() => {
       const r = Math.random().toString(36);
+      console.log('appScope as obj', appScope.toObject());
       // appScope.fromObject({
       //     settings: {
       //       priceType: 'New total',
