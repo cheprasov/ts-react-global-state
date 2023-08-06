@@ -39,10 +39,9 @@ const libConfig = {
 
 const demoConfig = {
     target: 'node',
+    devtool: 'source-map',
     entry: {
-        'GlobalState': './demo/GlobalState/index.tsx',
-        'GlobalReducer': './demo/GlobalReducer/index.tsx',
-        'NestedGlobalScope': './demo/NestedGlobalScope/index.tsx',
+        'GlobalScope': './demo/GlobalScope/index.tsx',
     },
     output: {
         filename: '[name].js',

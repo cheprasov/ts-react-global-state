@@ -1,14 +1,6 @@
-export {
-    createGlobalState,
-    useGlobalState,
-    createGlobalReducer,
-    useGlobalReducer,
-    createGlobalScope,
-    createMultiGlobalScopes,
-    useGlobalScope,
-    withGlobalScope,
-} from './GlobalState/GlobalState';
+export { useGlobalScope } from './global-scope/useGlobalScope';
+export { createGlobalScope } from './global-scope/createGlobalScope';
+export { withGlobalScope } from './global-scope/withGlobalScope';
+export { Scope } from './global-scope/Scope';
 
-export { Scope } from './GlobalState/Scope';
-export { GlobalScope, hydrateGlobalScope } from './GlobalState/GlobalScope';
-export { GlobalReducer } from './GlobalState/GlobalReducer';
+export type { TScope } from './global-scope/types';

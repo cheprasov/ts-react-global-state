@@ -1,6 +1,6 @@
 {
     "name": "@cheprasov/react-global-state",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "author": "Alexander Cheprasov",
     "description": "The library allows to manage global state easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.",
     "keywords": [
@@ -22,13 +22,13 @@
         "url": "git+https://github.com/cheprasov/ts-react-global-state"
     },
     "peerDependencies": {
-        "@types/react": "^18.0.8",
-        "@types/react-dom": "^18.0.0",
-        "react": "^18.1.0",
-        "react-dom": "^18.1.0"
+        "@types/react": "^18.2.18",
+        "@types/react-dom": "^18.2.7",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "dependencies": {
-        "@cheprasov/data-structures": "^0.2.0"
+        "@cheprasov/data-structures": "github:cheprasov/ts-data-structures#master"
     },
     "devDependencies": {
         "@testing-library/react": "^13.1.1",
@@ -36,8 +36,8 @@
         "@types/jest": "^27.4.1",
         "@types/react": "^18.0.8",
         "@types/react-dom": "^18.0.0",
-        "react": "^18.1.0",
-        "react-dom": "^18.1.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
         "ts-jest": "^27.1.4",
         "ts-loader": "^9.2.9",
         "ts-node": "^10.7.0",

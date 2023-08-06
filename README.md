@@ -1,6 +1,6 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v2.1.0)
+@cheprasov/react-global-state (v3.0.0)
 =========
 
 The library allows to manage global state and nested global states easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
@@ -8,8 +8,10 @@ The library allows to manage global state and nested global states easy. It is b
 ### Features:
 - The library use React API for implementation the Global State feature.
 - Simple & Powerful work with Global State.
-- Allows to have several Global States and nested Global States.
+- Allows to have several Global States / nested Global States.
 - It supports Functional & Class Components.
+- Possibility to get/set values to Global States outside react components.
+- Is it possibly to subscribe on Global State updates.
 - Easy to learn and use.
 - Written on TypeScript and supports types.
 
@@ -20,158 +22,33 @@ The library allows to manage global state and nested global states easy. It is b
 ```
 
 ```javascript
-import {
-    createGlobalState, useGlobalState,
-    createGlobalReducer, useGlobalReducer,
-    createGlobalScope, useGlobalScope,
-    createMultiGlobalScopes, withGlobalScope,
-} from '@cheprasov/react-global-state';
+import { createGlobalScope, useGlobalScope, Scope } from '@cheprasov/react-global-state';
 ```
 
 ### 2. If you know React then you almost know the library already.
 
-#### 2.1. Global State.
-React provides `useState` hook for working with local state for creating a new state and using it.
-
-The library splits creating and using features to 2 separate functions:
-- `createGlobalState(name: string, initialValue: any)` - function for creating a new global state and should be used outside a component and should be called only once for creating a new state.
-- `useGlobalState(name: string)` - the hook allows to use global state inside a component.
-
-**Example:** Creating a Global State values
-
-```typescript
-import { createGlobalState } from '@cheprasov/react-global-state';
-
-// The original object will not be changed
-
-const GlobalCounter = createGlobalState('count', 0);
-// Created global state with name `count` and initial value `0`. The name allows to use the global state inside a component.
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-    <GlobalCounter>
-        <App />
-    </GlobalCounter>
-);
-```
-
-**Example:** Using a Global State values
-
-```typescript
-import { useGlobalState } from '@cheprasov/react-global-state';
-
-const Counter: React.FC = () => {
-    const  [ count, setCount ] = useGlobalState<number>('count'); // like useState
-
-    const increaseCount = () => {
-        // `set function` has the same API like a `set function` from React.useState()
-        setCount((value) => value + 1);
-    }
-
-    return (
-        <div>
-            Counter: {count} <button onClick={increaseCount}>+</button>
-        </div>
-    );
-}
-```
-
-#### 2.2. Global Reducer
-React provides `useReducer` hook for working with local states for creating a new state and using it.
-
-This library splits creating and using features to 2 separate functions:
-- `createGlobalReducer(name: string, reducer: Function, initialState: any, initialiser?: Function)` - function for creating a new global state and should be used outside a component and should be called only once for creating a new state.
-- `useGlobalReducer(name: string)` - the hook allows to use global reducer inside a component.
-
-**Example:** Creating a new Global Reducer
-
-```typescript
-const userState = {
-  name: 'Alex',
-  city: 'London',
-  age: 37,
-};
-
-const reducer = (state, action) => {
-    let { age } = state;
-    if (action.type === 'age/increment') {
-        age += 1;
-    }
-    if (action.type === 'age/decrement') {
-        age -= 1;
-    }
-    return {
-        ...state,
-        age,
-    };
-}
-
-const UserGlobalReducer = createGlobalReducer('user',  reducer, userState);
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-    <UserGlobalReducer>
-        <App/>
-    </UserGlobalReducer>
-);
-```
-
-**Example:** Creating a new Global Reducer
-
-```typescript
-import { useGlobalReducer } from '../../../src/GlobalState/GlobalState';
-
-const User: React.FC = () => {
-
-    const [user, dispath] = useGlobalReducer('user');
-    //` useGlobalReducer` has the same return params like `useReducer`
-
-    const increaseAge = () => {
-        dispath({ type: 'age/increment' });
-    }
-
-    const decrementAge = () => {
-        dispath({ type: 'age/decrement' });
-    }
-
-    useEffect(() => {
-        console.log('Some value of user state is changed');
-    }, [user]);
-
-    return (
-        <div>
-            Name: {user.name} <br />
-            City: {user.city} <br />
-            Age: {user.age} <button onClick={decrementAge}>-</button> / <button onClick={increaseAge}>+</button> <br />
-        </div>
-    );
-}
-
-export default User;
-```
-
-#### 2.3. Global Scope (Global Collection of states).
-The library's function `createGlobalScope(name: string: scope: Object)` allows to create multi states easy under a global scope. And the hook `useGlobalScope(name: string)` allows to use any state from the global scope like a separate state param.
+#### 2.1. Global Scope (Collection of Global States).
+The library's function `createGlobalScope(scope: Object)` allows to create multi states easy under a global scope. And then use hook `useGlobalScope(name: string | Scope)` allows to use any state from the global scope like a separate state param.
 
 **Example**: Creating a Global Scope
 
 ```typescript
-import { createGlobalScope } from '@cheprasov/react-global-state';
+import { createGlobalScope, Scope } from '@cheprasov/react-global-state';
 
 // The original object will not be changed
-const userScope = {
+const rootScope = new Scope({
     name: 'Alex',
     city: 'London',
     age: 37,
-};
+});
 
-const UserGlobalScope = createGlobalScope('user', userScope); // return React.FunctionComponent
+const GlobalScope = createGlobalScope(rootScope); // return React.FunctionComponent
 
 const root = ReactDOM.createRoot(document.getElementByI('root'));
 root.render(
-    <UserGlobalScope>
+    <GlobalScope>
         <App />
-    </UserGlobalScope>
+    </GlobalScope>
 );
 
 ```
@@ -182,10 +59,10 @@ root.render(
 import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
-    const userScope = useGlobalScope('user');
-    const [ name, setName ] = userScope.name; // like useState
-    const [ city, setCity] = userScope.city; // like useState
-    const [ age, setAge ] = userScope.age; // like useState
+    const user = useGlobalScope(); // use empty param for getting root scope
+    const [ name, setName ] = user.name; // like useState
+    const [ city, setCity] = user.city; // like useState
+    const [ age, setAge ] = user.age; // like useState
 
     const increaseAge = () => {
         // `set function` has the same API like a `set function` from React.useState()
@@ -194,7 +71,7 @@ const User: React.FC = () => {
 
     const useEffect(() => {
         // Triggers when any state of the scope is changed
-    }, [useScope])
+    }, [user])
 
     return (
         <div>
@@ -244,24 +121,25 @@ class UserClass extends React.Component {
     }
 }
 
-const UserClassWithGlobalScope = withGlobalScope(UserClass, { user: 'userGlobalScope' });
+// Note, we use empty key for getting root scope
+const UserClassWithGlobalScope = withGlobalScope(UserClass, { '': 'userGlobalScope' });
 
 export { UserClassWithGlobalScope as UserClass };
 
 ```
 
-#### 2.4. Creating Nested Global Scopes / Multi Global Scopes.
+#### 2.2. Creating Nested Global Scopes / Multi Global Scopes.
 
-The main idea of the library is operation with Nested Global Scopes. For example, you can created complicated structure of Global Scopes with nested Global Scopes and Global Reducers.
+The main idea of the library is operation with Nested Global Scopes. For example, you can created complicated structure of Global Scopes with nested Global Scopes.
 
 Let's check the example:
 ```typescript
-const nestedScopes = {
-    app: new GlobalScope({
-        settings: new GlobalScope({
+const rootScopes = new Scope({
+    app: new Scope({
+        settings: new Scope({
             priceType: 'total',
         }),
-        user: new GlobalScope({
+        user: new Scope({
             name: 'Alex',
             city: 'London',
             age: 37,
@@ -270,7 +148,7 @@ const nestedScopes = {
                 it: 'expert',
             },
         }),
-        search: new GlobalScope({
+        search: new Scope({
             departure: 'London',
             destination: 'Paris',
             date: Date.now(),
@@ -278,7 +156,7 @@ const nestedScopes = {
                 { adult: 2 },
             ],
             nights: 7,
-            filters: new GlobalScope({
+            filters: new Scope({
                 rating: 5,
                 price: {
                     min: 0,
@@ -287,9 +165,9 @@ const nestedScopes = {
             }),
         }),
     }),
-};
+});
 
-const GlobalScopes = createMultiGlobalScopes(nestedScopes);
+const GlobalScopes = createGlobalStates(rootScopes);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -299,15 +177,15 @@ root.render(
 );
 ```
 
-In the example below we created 5 global scopes: `app`, `settings`, `user`, `search` and `filters`. As you can see global scope `filters` is nested to global scope `search`, and `search` is nested to global scope `app`. Also, global scopes `user` and `setting` are nested to `app` scope too.
+In the example below we created 6 global scopes: root, `app`, `settings`, `user`, `search` and `filters`. As you can see global scope `filters` is nested to global scope `search`, and `search` is nested to global scope `app`. Also, global scopes `user` and `setting` are nested to `app` scope too.
 
-This nested model creates relationship between the global scopes. If any field in a scope is updated then the scope will be updated, and as result all parent scopes will be updated too. Like a bubbling principle.When a state updates on an scope, it first updates the scope, then on its parent scope, then all the way up on other parent scopes.
+This nested model creates relationship between the global scopes. If any field in a scope is updated then the scope will be updated too, and as result all parent scopes will be updated too. Like a bubbling principle. When a state updates on an scope, it first updates the scope, then on its parent scope, then all the way up on other parent scopes.
 
 For example. We can change desctination at `search` scope.
 ```typescript
 const SomeComponent = () => {
     // ...
-    const searchGlobalScope = useGlobalScope('search');
+    const searchGlobalScope = useGlobalScope('app.search');
     const [ destination, setDestionation ] = searchGlobalScope.destination;
     // ...
         setDestionation('Rome');
@@ -322,10 +200,10 @@ Example:
 const App = () => {
     // ...
     const appScope = useGlobalScope('app');
-    const userScope = appGlobalScope.user; // or useGlobalScope('user');
-    const settingsScope = appGlobalScope.settings; // or useGlobalScope('settings');
-    const searchScope = appGlobalScope.search; // or useGlobalScope('search');
-    const filtersScope = appGlobalScope.filters; // or useGlobalScope('filters');
+    const userScope = appGlobalScope.user; // or useGlobalScope('app.user');
+    const settingsScope = appGlobalScope.settings; // or useGlobalScope('app.settings');
+    const searchScope = appGlobalScope.search; // or useGlobalScope('app.search');
+    const filtersScope = appGlobalScope.filters; // or useGlobalScope('app.search.filters');
 
     useEffect(() => {
         // will be called if any state is updated at any of nested scopes
@@ -346,108 +224,33 @@ const App = () => {
 }
 ```
 
-#### 2.5. Demo examples
+#### 2.3. Demo examples
 Please see more examples at [demo folder](/demo/).
 
 ### 3. Documentation
 
-#### 3.1. Global State
+#### 3.1. Global Scope
 
-#### 3.3.1. Creating a Global State
+#### 3.1.1. Creating a Global Scope
 ```typescript
-
-createGlobalState(name: string, initialState: any | (() => any)) // Returns React.memo(React.FunctionalComponent)
-```
-Please note, the `createGlobalState` should be called once and outside a component implementation.
-
-**Params:**
- - name: `string` - Unique name for the scope.
- - initialState: `any | (() => any)` - Initial value or function for initialisation an initial value. It has the same API as standard hook `React.useState(initialState: any | (() => any))`
-
-**Returns:**
- - `React.FunctionalComponent` (Wrapped by React.memo). It should be used inside your application (at any render level) for initialisation Global State feature for children components.
-
-**Examples:**
-```typescript
-import { useGlobalScope } from '@cheprasov/react-global-state';
-
-const UserGlobalState = createGlobalScope('user', 'Alex');
-
-const App: React.FC = () => {
-    // ...
-    return (
-        <div className="App">
-            <SomeComponents>
-                ...
-            </SomeComponents>
-            <UserGlobalState>
-                Components here will be able to use the 'user' global state
-            </UserGlobalState>
-        </div>
-    );
-}
-```
-
-#### 3.3.2. Reading / Updating Global Scope
-```typescript
-useGlobalState(name: string) // Returns { [key: string]: [value, setValue function] }
-```
-The hook `useGlobalState(name)` should be used inside a Functional Component for getting a state with value and set functions.
-
-**Params:**
- - name: `string` - Name of Global State.
-
-**Returns:**
-- Return an array with value and set value function. `[value, setValue]` (Almost the same like standard hook `React.useState(...)`). The returned array also has additional props:
-    - `globalState` - The property is always `true`.
-    - `stateValue` - The alias for the first `[0]` element in the array;
-    - `setStateValue` - The alias for the second `[1]` element in the array;
-
-**Examples:**
-
-```javascript
-import { useGlobalState } from '@cheprasov/react-global-state';
-
-const User: React.FC = () => {
-
-    const [ name, setName ] = useGlobalState('user'); // like useState
-
-    useEffect(() => {
-        // shows message only if name is changed
-        console.log('Name is changed, new name:', name);
-    }, [name]);
-
-    return (
-        <div>
-            User Name: {name} <br />
-        </div>
-    );
-}
-```
-
-#### 3.3. Global Scope
-
-#### 3.3.1. Creating a Global Scope
-```typescript
-createGlobalScope(name: string, scope: Record<string, any>) // Returns React.memo(React.FunctionalComponent)
+createGlobalScope(scope: Scope) // Returns React.memo(React.FunctionalComponent)
 ```
 Please note, the `createGlobalScope` should be called once and outside a component implementation.
 
 **Params:**
- - name: `string` - Unique name for the scope.
- - scope: `Record<string, any>` - An object that will be used for creating key/values for a scope. The original object will be never changed.
+ - scope: `Scope` - A Scope object with scope sctucture.
 
 **Returns:**
  - `React.FunctionalComponent` (Wrapped by React.memo). It should be used inside your application (at any render level) for initialisation Global State feature for children components.
 
 **Examples:**
 ```typescript
-const UserGlobalScope = createGlobalScope('user', { name: 'Alex' });
+const GlobalScope = createGlobalScope(new Scope({ name: 'Alex' }));
 //...
 root.render(
-    <UserGlobalScope>
+    <GlobalScope>
       <App />
-    </UserGlobalScope>
+    </GlobalScope>
 );
 ```
 or
@@ -455,44 +258,44 @@ or
 
 import { useGlobalScope } from '@cheprasov/react-global-state';
 
-const UserGlobalScope = createGlobalScope('user', { name: 'Alex' });
+const GlobalScope = createGlobalScope(new Scope({ name: 'Alex' }));
 
 const App: React.FC = () => {
     // ...
     return (
-        <div className="App">
-            <SomeComponents>
-                ...
-            </SomeComponents>
-            <UserGlobalScope>
-                Components here will be able to use the 'user' global scope
-            </UserGlobalScope>
-        </div>
+        <GlobalScope>
+            All components here will be able to use the global scope
+            <div className="App">
+                <SomeComponents>
+                    ...
+                </SomeComponents>
+            </div>
+        </GlobalScope>
     );
 }
 ```
 
-#### 3.3.2. Reading / Updating Global Scope
+#### 3.1.2. Reading / Updating Global Scope
 ```typescript
-useGlobalScope(name: string) // Returns Scope { [key: string]: [value, setValue function] }
+useGlobalScope(name: string | Scope = '') // Returns Scope { [key: string]: [value, setValue function] }
 ```
-The hook function `useGlobalScope(name)` should be used inside a Functional Component for getting a scope object with value and set functions for each state in the scope.
+The hook function `useGlobalScope()` should be used inside a Functional Component for getting a scope object with value and set functions for each state in the scope.
 
 **Params:**
- - name: `string` - Name of scope.
+ - name: `string | Scope` - Name of scope. Use empty param for using root scope.
 
 **Returns:**
-- `Scope` object like `Record<string, [value, setValue function]}`. Or you could think about the scope like an object with keys and result of call `useState()` for each value: `Record<string, useState(value)}`.
-Note, the returned scope object is always a new object if any of scope's values is updated.
+- `ScopeVariablesWrapper` object like `Record<string, [value, setValue function]}`. Or you could think about the scope like an object with keys and result of call `useState()` for each value: `Record<string, useState(value)}`.
+Note, the returned wrapped scope object is always a new object if any of scope's values is updated.
 
 **Examples:**
-```
-const userScope = {
+```TypeScript
+const userScope = new Scope({
     name: 'Alex',
     city: 'London',
     age: 37,
-}
-const UserGlobalScope = createGlobalScope('user', userScope);
+});
+const UserGlobalScope = createGlobalScope(userScope);
 //...
 root.render(
     <UserGlobalScope>
@@ -506,7 +309,7 @@ import { useGlobalScope } from '@cheprasov/react-global-state';
 
 const User: React.FC = () => {
 
-    const globalScope = useGlobalScope('user');
+    const globalScope = useGlobalScope();
     // globalScope = {
     //    name: ['Alex', setName],
     //    city: ['London', setCity],
@@ -551,7 +354,7 @@ const User: React.FC = () => {
 }
 ```
 
-#### 3.3.3. Using Global Scope at Class Components
+#### 3.1.3. Using Global Scope at Class Components
 
 For using Global Scope with Class Component please wrap the Class Component at Functional Component and provide Global Scope like a property.
 
@@ -592,7 +395,7 @@ export default class UserClass extends React.Component<React.PropsWithChildren<U
 
 ```javascript
 const WrappedUserClass = ({ children = undefined }) => {
-    const userScope = useGlobalScope('user');
+    const userScope = useGlobalScope();
 
     // you can use as many Global Scopes as you need.
 
@@ -624,20 +427,21 @@ withGlobalScope(Component: React.Component, scopeToProp: Record<string, string> 
 ```javascript
 export const UserClassWithGlobalScope = withGlobalScope(
     UserClass, // Original Class, please see above
-    { user: 'userGlobalScope' }, // <Global Scope Name for key>: <Class Property Name for value>
+    { '': 'userGlobalScope' }, // <Global Scope Name for key>: <Class Property Name for value>
+    // Note, we use empty key for getting root scope to userGlobalScope prop
 );
 ```
 
-#### 3.3.4. Creating Nested Global Scopes
+#### 3.1.4. Creating Nested Global Scopes
 ```typescript
-createMultiGlobalScopes(scopes: Object) // Returns React.memo(React.FunctionalComponent)
+createGlobalScope(scope: Scope) // Returns React.memo(React.FunctionalComponent)
 ```
-Please note, the `createMultiGlobalScopes` should be called once and outside a component implementation.
+Please note, the `createGlobalScope` should be called once and outside a component implementation.
 
 **Params:**
- - scopes: `Object` - An object that will be used for creating key/values for scopes. The original object will be never changed. Allowed to have nested scopes.
+ - scope: `Scope` - A Scope object. Allowed to have nested scopes.
 
- Please note, for creating nested objects like a scope, the object should be wrapped by `Scope()` function.
+ Please note, for creating nested objects like a scope, the object should be wrapped by `new Scope(...)` class.
 
 **Returns:**
  - `React.FunctionalComponent` (Wrapped by React.memo). It should be used inside your application (at any render level) for initialisation Global State feature for children components.
@@ -645,14 +449,14 @@ Please note, the `createMultiGlobalScopes` should be called once and outside a c
 **Examples:**
 ```typescript
 
-import { GlobalScope, GlobalReducer } from '@cheprasov/react-global-state';
+import { Scope } from '@cheprasov/react-global-state';
 
-const nestedScope = {
-  app: new GlobalScope({
-    settings: new GlobalScope({
+const rootScope = new Scope({
+  app: new Scope({
+    settings: new Scope({
       priceType: 'total',
     }),
-    user: new GlobalScope({
+    user: new Scope({
       name: 'Alex',
       city: 'London',
       age: 37,
@@ -661,7 +465,7 @@ const nestedScope = {
         it: 'expert',
       },
     }),
-    search: new GlobalScope({
+    search: new Scope({
       departure: 'London',
       destination: 'Paris',
       date: Date.now(),
@@ -669,7 +473,7 @@ const nestedScope = {
         { adult: 2 },
       ],
       nights: 7,
-      filters: new GlobalScope({
+      filters: new Scope({
         rating: 5,
         price: {
           min: 0,
@@ -678,9 +482,9 @@ const nestedScope = {
       }),
     }),
   }),
-};
+});
 
-const GlobalScope = createMultiGlobalScopes(nestedScope);
+const GlobalScope = createGlobalScope(rootScope);
 
 root.render(
     <GlobalScope>
@@ -730,23 +534,22 @@ const App: React.FC = () => {
     );
 }
 ```
-#### 3.3.5. Import/Export Global Scopes
+#### 3.1.5. Import/Export Global Scopes
 
-`useGlobalScope(...)` returns an instance of `Scope` object. The objects has the following methods:
+`useGlobalScope(...)` returns an instance of `ScopeVariablesWrapper` object. The objects has the following methods:
 - `toObject()` - it converts states of scope and nested scopes to JavaScript object. The object could be used any way you want.
-- `fromObject(obj)` - it takes passed object and updates states of the scope and nested scopes.
 
 **Examples:**
 ```typescript
 
-import { GlobalScope, GlobalReducer } from '@cheprasov/react-global-state';
+import { Scope } from '@cheprasov/react-global-state';
 
-const nestedScope = {
-  app: new GlobalScope({
-    settings: new GlobalScope({
+const rootScope = new Scope({
+  app: new Scope({
+    settings: new Scope({
       priceType: 'total',
     }),
-    user: new GlobalScope({
+    user: new Scope({
       name: 'Alex',
       city: 'London',
       age: 37,
@@ -755,7 +558,7 @@ const nestedScope = {
         it: 'expert',
       },
     }),
-    search: new GlobalScope({
+    search: new Scope({
       departure: 'London',
       destination: 'Paris',
       date: Date.now(),
@@ -763,7 +566,7 @@ const nestedScope = {
         { adult: 2 },
       ],
       nights: 7,
-      filters: new GlobalScope({
+      filters: new Scope({
         rating: 5,
         price: {
           min: 0,
@@ -772,9 +575,9 @@ const nestedScope = {
       }),
     }),
   }),
-};
+});
 
-const GlobalScope = createMultiGlobalScopes(nestedScope);
+const GlobalScope = createGlobalScope(rootScope);
 
 root.render(
     <GlobalScope>
@@ -794,7 +597,7 @@ const App: React.FC = () => {
     const [ departure, setDeparture ] = app.search.departure; // like useState
 
     // if you need only nested scope like filters
-    const filters = useGlobalScope('filters');
+    const filters = useGlobalScope('app.search.filters');
         const [ rating, setRating ] = filters.rating; // like useState
 
     useEffect(() => {
