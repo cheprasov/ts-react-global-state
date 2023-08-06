@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
-import { AppNestedScopeInf } from '../types';
+import { TAppScope } from '../types';
 import Hobby from './Hobby';
 import { useGlobalScope } from '../../../src/global-scope/useGlobalScope';
 
 const User: React.FC = () => {
-    const userScope = useGlobalScope<AppNestedScopeInf['app']['user']>('app.user');
+    const userScope = useGlobalScope<TAppScope['app']['user']>('app.user');
 
     const [ name, setName ] = userScope.name; // like useState
     const [ city ] = userScope.city; // like useState
