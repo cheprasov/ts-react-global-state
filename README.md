@@ -6,7 +6,7 @@
 The library allows to manage global state and nested global states easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
 
 ### Features:
-- The library use React API for implementation the Global State feature.
+- The library uses React API for implementation the Global State features.
 - Simple & Powerful work with Global State.
 - Allows to have several Global States / nested Global States.
 - It supports Functional & Class Components.
