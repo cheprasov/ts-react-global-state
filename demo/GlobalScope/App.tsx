@@ -7,6 +7,7 @@ import { useGlobalScope } from '../../src';
 
 function App() {
   const appScope = useGlobalScope<TAppScope['app']>('app');
+  //appScope.date.v
 
   const [ test, setTest ] = appScope.settings.test;
 

@@ -1,28 +1,28 @@
 import React from 'react';
-import { Nullable, Object, Tree } from '@cheprasov/data-structures';
+import { Nullable, Objects, Tree } from '@cheprasov/data-structures';
 import { Scope } from './Scope';
 import { TContextByScopeOrName } from './types';
 import { createGlobalScopeContext } from './createGlobalScopeContext';
 import { GlobalScopeWrapper } from './GlobalScopeWrapper';
 import ComponentWrapper from '../components/ComponentWrapper';
 
-export type TScopeByKey = Map<string, Scope>;
+export type TScopeByKey = Map<string, Scope<any>>;
 
 interface IScopeNode {
     key: string;
-    scope: Scope;
+    scope: Scope<any>;
     parent: Nullable<Scope>;
     type: 'scope'
 };
 
-export const createGlobalScope = (scope: Scope) => {
+export const createGlobalScope = (scope: Scope<any>) => {
     const contextByScopeOrName: TContextByScopeOrName = new Map();
 
     const scopeNodes = Tree.levelOrderTreeTraversal<IScopeNode, IScopeNode[]>(
         { key: '', scope, parent: null, type: 'scope' },
         (node) => {
             const keyPrefix = node.key ? `${node.key}.` : '';
-            return Object.Helper.reduce<IScopeNode[], Scope, Record<string, Scope>>(node.scope.getChildrenScopesByKey(), (res, scope, key) => {
+            return Objects.Helper.reduce<IScopeNode[], Scope, Record<string, Scope>>(node.scope.getChildrenScopesByKey(), (res, scope, key) => {
                 res.push({ key: `${keyPrefix}${key}`, scope, parent: node.scope, type: 'scope' });
                 return res;
             }, []);
