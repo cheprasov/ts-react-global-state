@@ -1,6 +1,6 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-@cheprasov/react-global-state (v3.0.0)
+@cheprasov/react-global-state (v3.1.0)
 =========
 
 The library allows to manage global state and nested global states easy. It is based on React Context API and allows to pass states (values & set functions) to children components via Context.
@@ -12,6 +12,7 @@ The library allows to manage global state and nested global states easy. It is b
 - It supports Functional & Class Components.
 - Possibility to get/set values to Global States outside react components.
 - Is it possibly to subscribe on Global State updates.
+- Supports client-side & server-side renders.
 - Easy to learn and use.
 - Written on TypeScript and supports types.
 
