@@ -1,30 +1,31 @@
-import { TScope } from '../../src';
+import { Scope, TExtractScope } from '../../src';
 
-export type TAppScope = TScope<{
-    app: TScope<{
-        settings: TScope<{
+export type TAppScope = Scope<{
+    app: Scope<{
+        date: Date,
+        settings: Scope<{
             priceType: string; // total | perPerson
             test: boolean;
         }>;
         // counter: GlobalReducer<{
         //     counter: number,
         // }>;
-        user: TScope<{
+        user: Scope<{
             name: string;
             city: string;
             age: number;
-            hobby: TScope<{
+            hobby: Scope<{
                 chess: string;
                 it: string;
             }>,
         }>;
-        search: TScope<{
+        search: Scope<{
             departure: string;
             destination: string;
             date: number;
             rooms: {adult: number, children?: number}[];
             nights: number,
-            filters: TScope<{
+            filters: Scope<{
                 rating: number,
                 price: {
                     min: number,
@@ -34,3 +35,5 @@ export type TAppScope = TScope<{
         }>,
     }>,
 }>;
+
+export type TAppUseScope = TExtractScope<TAppScope>;

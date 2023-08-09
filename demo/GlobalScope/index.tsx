@@ -3,9 +3,11 @@ import * as ReactDOM from 'react-dom/client';
 import App from './App';
 import { Scope } from '../../src/global-scope/Scope';
 import { createGlobalScope } from '../../src';
+import { TAppScope } from './types';
 
-const scope = new Scope({
+const scope: TAppScope = new Scope({
     app: new Scope({
+        date: new Date(),
         settings: new Scope({
             priceType: 'total', // total | perPerson
             test: true,
@@ -61,15 +63,15 @@ const scope = new Scope({
             }),
         }),
     }),
-});
+}) as TAppScope;
 
 scope.addScopeUpdatesListener((values) => {
     console.log('ScopeUpdateListener', values, scope.toObject());
 });
 
 setTimeout(() => {
-    console.log('AGE', scope.getValue('app').getValue('user').getValue('age'));
-    scope.getValue('app').getValue('user').setValue('age', (age: number) => age + 5);
+    console.log('AGE', scope.get('app').get('user').get('age'));
+    scope.get('app').get('user').set('age', (age: number) => age + 5);
 }, 3000);
 
 const GlobalScope = createGlobalScope(scope);

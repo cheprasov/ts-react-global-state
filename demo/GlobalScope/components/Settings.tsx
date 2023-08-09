@@ -1,5 +1,5 @@
 import React from 'react';
-import { TAppScope } from '../types';
+import { TAppUseScope } from '../types';
 import Value from './Value';
 import { useGlobalScope } from '../../../src';
 
@@ -7,7 +7,7 @@ import { useGlobalScope } from '../../../src';
 const priceTypeList: string[] = ['perPerson', 'total'];
 
 const Settings: React.FC = () => {
-    const settingsState = useGlobalScope<TAppScope['app']['settings']>('app.settings');
+    const settingsState = useGlobalScope<TAppUseScope['app']['settings']>('app.settings');
     const [ priceType, setPriceType ] = settingsState.priceType;
 
     return (

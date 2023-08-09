@@ -1,14 +1,11 @@
-import { IScopeVariables, TScope, TStateTupleExtended } from "./types";
+import { Scope } from './Scope';
+import { IScopeVariables, TScope, TStateTupleExtended } from './types';
 
-export type TScopeValues<T> =
-    T extends TScope<any>
-    ? {
-      [P in keyof T]: TScopeValues<T[P]>;
-    } & IScopeMethods
+export type TScopeValues<T> = T extends TScope
+    ? Omit<{ [P in keyof T]: TScopeValues<T[P]> } & IScopeMethods, '$$__global_scope_type'>
     : [T] extends [boolean]
         ? TStateTupleExtended<boolean>
         : TStateTupleExtended<T>;
-    ;
 
 interface IScopeMethods {
     toObject(): Record<string, any>;

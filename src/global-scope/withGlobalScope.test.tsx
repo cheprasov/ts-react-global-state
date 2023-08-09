@@ -110,7 +110,7 @@ describe('withGlobalScope', () => {
         );
         const userElement = container.querySelector('.User');
         expect(userElement).not.toBeNull();
-        expect(userElement?.textContent).toEqual(userScope.getValue('name'));
+        expect(userElement?.textContent).toEqual(userScope.get('name'));
     });
 
     it('should with children well if Class Component uses Global State', () => {
@@ -140,7 +140,7 @@ describe('withGlobalScope', () => {
         );
         const userElement = container.querySelector('.User');
         expect(userElement).not.toBeNull();
-        expect(userElement?.textContent).toEqual(userScope.getValue('name'));
+        expect(userElement?.textContent).toEqual(userScope.get('name'));
 
         await act(async () => {
             const button = container.querySelector('.Updater button') as Element;
@@ -158,7 +158,7 @@ describe('withGlobalScope', () => {
                 <TestClassWithGlobalState />
             </GlobalScope>
         );
-        expect(container.querySelector('.User')?.textContent).toEqual(userScope.getValue('name'));
-        expect(container.querySelector('.Language')?.textContent).toEqual(configScope.getValue('lang'));
+        expect(container.querySelector('.User')?.textContent).toEqual(userScope.get('name'));
+        expect(container.querySelector('.Language')?.textContent).toEqual(configScope.get('lang'));
     });
 });

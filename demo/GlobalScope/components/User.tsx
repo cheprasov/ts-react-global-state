@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
-import { TAppScope } from '../types';
+import { TAppUseScope } from '../types';
 import Hobby from './Hobby';
 import { useGlobalScope } from '../../../src';
+import { TStateTupleExtended } from '../../../src/global-scope/types';
 
 const User: React.FC = () => {
-    const userScope = useGlobalScope<TAppScope['app']['user']>('app.user');
+    const userScope = useGlobalScope<TAppUseScope['app']['user']>('app.user');
 
     const [ name, setName ] = userScope.name; // like useState
     const [ city ] = userScope.city; // like useState
@@ -31,7 +32,8 @@ const User: React.FC = () => {
     }, [userScope]);
 
     const hobbies = useMemo(() => {
-        return Object.entries(userScope.hobby).map(([key, [value, setValue]]) => {
+        return Object.entries(userScope.hobby).map(([key, tuple]) => {
+            const [ value, setValue ] = tuple as TStateTupleExtended<any>;
             return <Hobby key={key} name={key} value={value} onChange={setValue} />
         });
     }, [userScope.hobby])

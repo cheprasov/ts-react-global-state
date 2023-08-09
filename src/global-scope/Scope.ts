@@ -1,27 +1,27 @@
-import { Nullable, Object, Observer } from '@cheprasov/data-structures';
-import { TSetState } from './types';
+import { Nullable, Objects, Observer, Strings } from '@cheprasov/data-structures';
+import type { TSetState, TSetStateAction } from './types';
 
-export interface IScopeData {
-    [key: string]: any | Scope;
+type TScopeData<T extends Record<string, any>> = {
+    [K in keyof T]: T[K];
 }
 
 type TSettersByKey = Record<string, TSetState<any>>;
 
-export class Scope {
+export class Scope<TData extends TScopeData<{}> = {}> {
 
-    protected _data: IScopeData;
-    protected _observer: Observer.Observer<IScopeData> = new Observer.Observer();
+    protected _data: TData;
+    protected _observer: Observer.Observer<Scope<TData>> = new Observer.Observer();
     protected _settersByKey: Nullable<TSettersByKey> = null;
-    protected _childrenScopesByKey: Readonly<Record<string, Scope>> = {};
+    protected _childrenScopesByKey: Readonly<Record<string, Scope<any>>> = {};
 
-    constructor(scope: IScopeData) {
+    constructor(scope: TData) {
         this._data = scope;
-        this._childrenScopesByKey = Object.Helper.filter(this._data, (value) => {
+        this._childrenScopesByKey = Objects.Helper.filter(this._data, (value) => {
             if (value instanceof Scope) {
                 return true;
             }
             return false;
-        });
+        }) as TData;
     }
 
     _getData() {
@@ -36,27 +36,37 @@ export class Scope {
         this._settersByKey = setters;
     }
 
-    getChildrenScopesByKey(): Record<string, Scope> {
+    getChildrenScopesByKey(): Record<string, Scope<any>> {
         return this._childrenScopesByKey;
     }
 
-    setValue<T>(key: string, value: TSetState<T>) {
-        if (!(key in this._data)) {
-            throw new Error(`Key '${key}' not found in Scope`);
+    getNestedScope<T extends TScopeData<{}> = {}>(name: string): Nullable<Scope<T>> {
+        const [ first, other ] = Strings.cut(name, '.');
+        const childScope = this._childrenScopesByKey[first];
+        if (childScope) {
+            return other ? childScope.getNestedScope(other) : childScope;
         }
-        if (key in this._childrenScopesByKey) {
-            return this._childrenScopesByKey[key].updateByObject(value);
+        return null;
+    }
+
+    set<TKey extends keyof TData, TValue>(key: TKey, value: TSetStateAction<TValue>) {
+        if (!(key in this._data)) {
+            throw new Error(`Key '${String(key)}' not found in Scope`);
+        }
+        if (key in this._childrenScopesByKey && typeof value === 'object' && value) {
+            return this._childrenScopesByKey[key as string].updateByObject(value);
         }
         if (this._settersByKey) {
-            this._settersByKey[key](value);
+            this._settersByKey[key as string](value);
         } else {
+            // @ts-ignore
             this._data[key] = typeof value === 'function' ? value(this._data[key]) : value;
         }
     }
 
-    getValue(key: string) {
+    get<TKey extends keyof TData>(key: TKey): TData[TKey] {
         if (!(key in this._data)) {
-            throw new Error(`Key '${key}' not found in Scope`);
+            throw new Error(`Key '${String(key)}' not found in Scope`);
         }
         return this._data[key];
     }
@@ -97,7 +107,7 @@ export class Scope {
             if (currentValue instanceof Scope) {
                 currentValue.updateByObject(newValue);
             } else if (newValue !== currentValue) {
-                this.setValue(key, newValue);
+                this.set(key, newValue);
                 this._data[key] = newValue;
             }
         }
@@ -108,7 +118,7 @@ export class Scope {
         }
     }
 
-    addScopeUpdatesListener(listener: Observer.ListenerCallback<IScopeData>) {
+    addScopeUpdatesListener(listener: Observer.ListenerCallback<Scope<TData>>) {
         this._observer.subscribe(listener);
     }
 

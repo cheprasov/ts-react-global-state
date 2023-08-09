@@ -2,12 +2,11 @@ import React, { useEffect } from 'react';
 import Search from './components/Search';
 import Settings from './components/Settings';
 import User from './components/User';
-import { TAppScope } from './types';
+import { TAppUseScope } from './types';
 import { useGlobalScope } from '../../src';
 
 function App() {
-  const appScope = useGlobalScope<TAppScope['app']>('app');
-
+  const appScope = useGlobalScope<TAppUseScope['app']>('app');
   const [ test, setTest ] = appScope.settings.test;
 
   //@ts-ignore
