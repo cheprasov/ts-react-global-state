@@ -15,6 +15,9 @@ export type TContextByScopeOrName = Map<Scope | string, Context<any>>;
 export interface IScopeVariables {
     [key: string]: TStateTupleExtended<any> | IScopeVariables;
 }
-export type TScope<T> = {
-    [P in keyof T]: T[P];
+export type TScope = {
+    $$__global_scope_type: 'Scope';
 };
+export type TExtractScope<T> = T extends Scope<infer TData> ? {
+    [K in keyof TData]: TExtractScope<TData[K]>;
+} & TScope : T;

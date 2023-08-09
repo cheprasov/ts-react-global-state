@@ -63,7 +63,7 @@ const scope: TAppScope = new Scope({
             }),
         }),
     }),
-});
+}) as TAppScope;
 
 scope.addScopeUpdatesListener((values) => {
     console.log('ScopeUpdateListener', values, scope.toObject());

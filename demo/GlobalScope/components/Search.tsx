@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { TAppScope } from '../types';
+import { TAppUseScope } from '../types';
 import Value from './Value';
 import { useGlobalScope } from '../../../src';
 
@@ -15,7 +15,7 @@ const destinationList: string[] = [
 const nightsList: string[] = Array(7).fill(0).map((v, i) => (i+1).toString());
 
 const Search: React.FC = () => {
-    const settingsState = useGlobalScope<TAppScope['app']['search']>('app.search');
+    const settingsState = useGlobalScope<TAppUseScope['app']['search']>('app.search');
     const [ departure, setDeparture ] = settingsState.departure;
     const [ destination, setDestination ] = settingsState.destination;
     const [ nights, setNights ] = settingsState.nights;

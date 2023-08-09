@@ -1,17 +1,11 @@
 import { Nullable, Objects, Observer, Strings } from '@cheprasov/data-structures';
-import { TSetState, TSetStateAction } from './types';
+import type { TSetState, TSetStateAction } from './types';
 
-export type TScopeData<T extends Record<string, any>> = {
+type TScopeData<T extends Record<string, any>> = {
     [K in keyof T]: T[K];
 }
 
 type TSettersByKey = Record<string, TSetState<any>>;
-
-// export type TExtractScope<Type> = Type extends Scope<infer T>
-//     ? {
-//         [K in keyof T]: TExtractScope<T[K]>
-//     }
-//     : [Type] extends [true] ? boolean : Type;
 
 export class Scope<TData extends TScopeData<{}> = {}> {
 
@@ -46,7 +40,7 @@ export class Scope<TData extends TScopeData<{}> = {}> {
         return this._childrenScopesByKey;
     }
 
-    getNestedScope(name: string): Nullable<Scope<any>> {
+    getNestedScope<T extends TScopeData<{}> = {}>(name: string): Nullable<Scope<T>> {
         const [ first, other ] = Strings.cut(name, '.');
         const childScope = this._childrenScopesByKey[first];
         if (childScope) {
