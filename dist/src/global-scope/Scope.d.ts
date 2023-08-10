@@ -19,7 +19,7 @@ export declare class Scope<TData extends TScopeData<{}> = {}> {
     get<TKey extends keyof TData>(key: TKey): TData[TKey];
     toObject(): Record<string, any>;
     updateByObject(obj: Record<string, any>): false | undefined;
-    addScopeUpdatesListener(listener: Observer.ListenerCallback<Scope<TData>>): void;
-    removeScopeUpdatesListener(listener: Function): void;
+    subscribe(listener: Observer.ListenerCallback<Scope<TData>>): void;
+    unsubscribe(listener: Observer.ListenerCallback<Scope<TData>>): void;
 }
 export {};

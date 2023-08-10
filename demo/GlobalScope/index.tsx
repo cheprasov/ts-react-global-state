@@ -65,7 +65,7 @@ const scope: TAppScope = new Scope({
     }),
 }) as TAppScope;
 
-scope.addScopeUpdatesListener((values) => {
+scope.subscribe((values) => {
     console.log('ScopeUpdateListener', values, scope.toObject());
 });
 

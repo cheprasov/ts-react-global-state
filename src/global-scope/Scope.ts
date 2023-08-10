@@ -118,10 +118,11 @@ export class Scope<TData extends TScopeData<{}> = {}> {
         }
     }
 
-    addScopeUpdatesListener(listener: Observer.ListenerCallback<Scope<TData>>) {
+    subscribe(listener: Observer.ListenerCallback<Scope<TData>>) {
         this._observer.subscribe(listener);
     }
 
-    removeScopeUpdatesListener(listener: Function) {
+    unsubscribe(listener: Observer.ListenerCallback<Scope<TData>>) {
+        this._observer.unsubscribe(listener);
     }
 }
