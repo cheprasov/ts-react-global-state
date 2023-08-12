@@ -523,8 +523,8 @@ const App: React.FC = () => {
 
     useEffect(() => {
         console.log('Rating property of the app.search.filters scope is updated');
-    }, [rating]); // or `app.search.filter.rating.stateValue`
-    // Note `app.search.filter.rating.stateValue` is an alias for app.search.filter.rating[0];
+    }, [rating]); // or `app.search.filter.rating.value`
+    // Note `app.search.filter.rating.value` is an alias for app.search.filter.rating[0];
 
     return (
         <div className="App">
@@ -616,8 +616,8 @@ const App: React.FC = () => {
 
     useEffect(() => {
         console.log('Rating property of the app.search.filters scope is updated');
-    }, [rating]); // or `app.search.filter.rating.stateValue`
-    // Note `app.search.filter.rating.stateValue` is an alias for app.search.filter.rating[0];
+    }, [rating]); // or `app.search.filter.rating.value`
+    // Note `app.search.filter.rating.value` is an alias for app.search.filter.rating[0];
 
     return (
         <div className="App">
