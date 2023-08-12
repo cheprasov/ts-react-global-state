@@ -205,7 +205,7 @@ const App = () => {
     const userScope = appGlobalScope.user; // or useGlobalScope('app.user');
     const settingsScope = appGlobalScope.settings; // or useGlobalScope('app.settings');
     const searchScope = appGlobalScope.search; // or useGlobalScope('app.search');
-    const filtersScope = appGlobalScope.filters; // or useGlobalScope('app.search.filters');
+    const filtersScope = appGlobalScope.search.filters; // or useGlobalScope('app.search.filters');
 
     useEffect(() => {
         // will be called if any state is updated at any of nested scopes
